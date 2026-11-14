@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" role="img" aria-label="Imagem indisponível">
+  <rect width="800" height="600" fill="#efe4d2" />
+  <g fill="none" stroke="#c9b89e" stroke-width="10" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M280 320 400 220l120 100" />
+    <path d="M310 300v140a14 14 0 0 0 14 14h152a14 14 0 0 0 14-14V300" />
+    <circle cx="400" cy="360" r="16" />
+    <path d="M400 376v34" />
+  </g>
+  <text x="400" y="510" text-anchor="middle" font-family="Georgia, serif" font-size="26" fill="#a1927e">
+    Foto em breve
+  </text>
+</svg>
