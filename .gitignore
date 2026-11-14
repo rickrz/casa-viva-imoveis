@@ -1,0 +1,41 @@
+# =====================================================================
+# Casa Viva Imóveis — arquivos que NÃO devem ir para o GitHub
+# =====================================================================
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.venv/
+venv/
+env/
+.Python
+
+# --- Variáveis de ambiente (contêm senhas e chaves!) ---
+.env
+.env.local
+.env.production
+backend/.env
+
+# --- Banco local / ferramentas ---
+*.sqlite3
+*.db
+.pytest_cache/
+.coverage
+htmlcov/
+
+# --- Sistema operacional ---
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# --- Editores ---
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# --- Logs e temporários ---
+*.log
+*.tmp

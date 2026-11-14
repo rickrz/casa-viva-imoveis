@@ -1,0 +1,48 @@
+# =====================================================================
+# Casa Viva Imóveis — Blueprint do Render
+# ---------------------------------------------------------------------
+# Com este arquivo no repositório, o deploy vira um clique:
+#   Render > New > Blueprint > escolher o repositório.
+#
+# As variáveis marcadas com `sync: false` são SEGREDOS: o Render pede
+# para preenchê-las no painel (nunca ficam no Git).
+#
+# O Render clona o repositório inteiro; com rootDir=backend, o Flask
+# encontra o front-end em ../frontend e serve o site na mesma URL.
+# =====================================================================
+
+services:
+  - type: web
+    name: casa-viva-api
+    runtime: python
+    plan: free
+    region: ohio
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app --bind 0.0.0.0:$PORT --workers 2 --timeout 60
+    healthCheckPath: /api/health
+    autoDeploy: true
+    envVars:
+      # --- versão do Python (o Render lê também o backend/.python-version) ---
+      - key: PYTHON_VERSION
+        value: 3.12.10
+
+      # --- IA: modelo principal e reservas (podem ficar no Git) ---
+      - key: GEMINI_MODEL
+        value: gemini-flash-latest
+      - key: GEMINI_MODEL_FALLBACKS
+        value: gemini-3.5-flash-lite,gemini-flash-lite-latest
+
+      # --- produção: sem recarregamento automático ---
+      - key: FLASK_DEBUG
+        value: "0"
+
+      # --- SEGREDOS: preencher no painel do Render ---
+      - key: DATABASE_URL
+        sync: false
+      - key: GEMINI_API_KEY
+        sync: false
+      # Cole aqui a URL do próprio Render, ex.:
+      # https://casa-viva-api.onrender.com
+      - key: ALLOWED_ORIGINS
+        sync: false
