@@ -1,0 +1,432 @@
+/* =====================================================================
+   Casa Viva Imóveis — admin.css
+   Estilos exclusivos do painel (admin.html). Reaproveita os tokens e os
+   componentes de base.css (botões, campos, link-botao, toast).
+   ===================================================================== */
+
+body.admin {
+  background: var(--areia);
+  min-height: 100vh;
+}
+
+/* ---------------------------------------------------------------------
+   1. BARRA SUPERIOR
+   --------------------------------------------------------------------- */
+.admin__topo {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  border-bottom: 1px solid var(--linha);
+  background: var(--papel);
+}
+
+.admin__barra {
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+  height: 74px;
+}
+
+.admin__topo .logo {
+  color: var(--tinta);
+}
+
+.admin__topo .logo__icone {
+  color: var(--verde);
+}
+
+.admin__divisor {
+  width: 1px;
+  height: 26px;
+  background: var(--linha);
+}
+
+.admin__etiqueta {
+  font-size: 0.74rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--tinta-suave);
+}
+
+.admin__acoes {
+  display: flex;
+  gap: 0.6rem;
+  margin-left: auto;
+}
+
+/* ---------------------------------------------------------------------
+   2. CABEÇALHO DA PÁGINA
+   --------------------------------------------------------------------- */
+.admin__conteudo {
+  padding-block: 2.5rem 4rem;
+}
+
+.admin__intro {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+.admin__intro h1 {
+  margin-bottom: 0.4rem;
+  font-size: clamp(1.8rem, 3vw, 2.4rem);
+}
+
+.admin__intro p {
+  max-width: 60ch;
+  font-size: 0.9rem;
+  color: var(--tinta-suave);
+}
+
+.admin__intro code {
+  padding: 0.1rem 0.35rem;
+  border-radius: 5px;
+  background: var(--areia-forte);
+  font-size: 0.85em;
+}
+
+/* ---------------------------------------------------------------------
+   3. CARTÕES DE RESUMO
+   --------------------------------------------------------------------- */
+.resumo {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.resumo__cartao {
+  padding: 1.1rem 1.2rem;
+  border: 1px solid var(--linha);
+  border-radius: var(--raio);
+  background: var(--papel);
+}
+
+.resumo__cartao span {
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--tinta-suave);
+}
+
+.resumo__cartao strong {
+  display: block;
+  margin-top: 0.15rem;
+  font-family: var(--fonte-titulo);
+  font-size: 1.9rem;
+  font-weight: 600;
+  line-height: 1.2;
+  color: var(--verde);
+}
+
+.resumo__cartao--alerta strong {
+  color: var(--terracota);
+}
+
+/* ---------------------------------------------------------------------
+   4. PAINEL E TABELA
+   --------------------------------------------------------------------- */
+.painel {
+  overflow: hidden;
+  border: 1px solid var(--linha);
+  border-radius: var(--raio-g);
+  background: var(--papel);
+}
+
+.painel__barra {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 1rem 1.2rem;
+  border-bottom: 1px solid var(--linha);
+}
+
+.painel__barra label {
+  font-size: 0.76rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--tinta-suave);
+}
+
+.painel__barra select {
+  padding: 0.5rem 0.7rem;
+  border: 1px solid var(--linha);
+  border-radius: 8px;
+  background: var(--branco);
+  font-size: 0.85rem;
+}
+
+.painel__barra select:focus {
+  outline: none;
+  border-color: var(--verde-600);
+}
+
+.painel__hora {
+  margin-left: auto;
+  font-size: 0.75rem;
+  color: var(--tinta-suave);
+}
+
+.tabela__rolagem {
+  overflow-x: auto;
+}
+
+.tabela {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.86rem;
+}
+
+.tabela th {
+  padding: 0.8rem 1rem;
+  border-bottom: 1px solid var(--linha);
+  background: #faf6ee;
+  color: var(--tinta-suave);
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-align: left;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.tabela td {
+  padding: 0.85rem 1rem;
+  border-bottom: 1px solid var(--linha);
+  vertical-align: top;
+}
+
+.tabela tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.tabela tbody tr:hover {
+  background: #fcf9f2;
+}
+
+.tabela__pessoa {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  min-width: 150px;
+}
+
+.tabela__pessoa strong {
+  font-size: 0.9rem;
+}
+
+.tabela__secundario {
+  font-size: 0.78rem;
+  color: var(--tinta-suave);
+  overflow-wrap: anywhere;
+}
+
+.tabela__mensagem {
+  display: -webkit-box;
+  max-width: 250px;
+  overflow: hidden;
+  color: var(--tinta-suave);
+  font-size: 0.82rem;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+/* --- Etiquetas de interesse --- */
+.pilula {
+  display: inline-block;
+  padding: 0.28rem 0.62rem;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.pilula--comprar {
+  background: var(--verde-claro);
+  color: var(--verde);
+}
+
+.pilula--alugar {
+  background: #f6e0d5;
+  color: var(--terracota-escura);
+}
+
+.pilula--vender {
+  background: #e8e4f5;
+  color: #4b3d8a;
+}
+
+.tabela__status {
+  padding: 0.45rem 0.55rem;
+  border: 1px solid var(--linha);
+  border-radius: 8px;
+  background: var(--branco);
+  font-size: 0.8rem;
+}
+
+.tabela__status:focus {
+  outline: none;
+  border-color: var(--verde-600);
+  box-shadow: 0 0 0 3px rgba(44, 122, 96, 0.14);
+}
+
+.tabela__status[disabled] {
+  opacity: 0.6;
+}
+
+.tabela__estado {
+  padding: 2rem 1.2rem;
+  color: var(--tinta-suave);
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+.tabela__estado[hidden] {
+  display: none;
+}
+
+/* ---------------------------------------------------------------------
+   5. RODAPÉ
+   --------------------------------------------------------------------- */
+.admin__rodape {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 1.5rem;
+  font-size: 0.79rem;
+  color: var(--tinta-suave);
+}
+
+/* ---------------------------------------------------------------------
+   6. RESPONSIVIDADE
+   Abaixo de 900px a tabela vira uma lista de cartões: cada célula mostra
+   o rótulo da coluna (data-rotulo) à esquerda.
+   --------------------------------------------------------------------- */
+@media (max-width: 1000px) {
+  .resumo {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 900px) {
+  .admin__etiqueta,
+  .admin__divisor {
+    display: none;
+  }
+
+  .admin__intro {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .tabela thead {
+    display: none;
+  }
+
+  .tabela,
+  .tabela tbody,
+  .tabela tr,
+  .tabela td {
+    display: block;
+    width: 100%;
+  }
+
+  .tabela tr {
+    border-bottom: 1px solid var(--linha);
+  }
+
+  .tabela td {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.55rem 1rem;
+    border-bottom: 1px dashed var(--linha);
+    text-align: right;
+  }
+
+  .tabela td:last-child {
+    border-bottom: 0;
+  }
+
+  .tabela td::before {
+    content: attr(data-rotulo);
+    flex: none;
+    font-size: 0.66rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-align: left;
+    text-transform: uppercase;
+    color: var(--tinta-suave);
+  }
+
+  .tabela__pessoa {
+    align-items: flex-end;
+  }
+
+  .tabela__mensagem {
+    max-width: none;
+    text-align: right;
+    -webkit-line-clamp: unset;
+  }
+}
+
+@media (max-width: 640px) {
+  .admin__barra {
+    height: 66px;
+    gap: 0.8rem;
+  }
+
+  .admin__topo .logo__texto small {
+    display: none;
+  }
+
+  .admin__acoes .btn--contorno {
+    display: none;
+  }
+
+  .admin__conteudo {
+    padding-block: 1.8rem 3rem;
+  }
+
+  .resumo {
+    grid-template-columns: 1fr 1fr;
+    gap: 0.7rem;
+  }
+
+  .resumo__cartao {
+    padding: 0.9rem 1rem;
+  }
+
+  .resumo__cartao strong {
+    font-size: 1.6rem;
+  }
+
+  .painel__hora {
+    width: 100%;
+    margin-left: 0;
+  }
+
+  .tabela td {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.2rem;
+    text-align: left;
+  }
+
+  .tabela__pessoa {
+    align-items: flex-start;
+  }
+
+  .tabela__mensagem {
+    text-align: left;
+  }
+}

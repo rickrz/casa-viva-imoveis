@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Painel de contatos — Casa Viva Imóveis</title>
+    <meta name="description" content="Painel administrativo para acompanhar os contatos recebidos pelo site da Casa Viva Imóveis." />
+    <meta name="theme-color" content="#1f5c4a" />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%231f5c4a'/%3E%3Cpath d='M16 7l8 6.8V24a1 1 0 0 1-1 1h-4.6v-6.4h-4.8V25H9a1 1 0 0 1-1-1V13.8z' fill='%23f7f1e6'/%3E%3C/svg%3E"
+    />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fraunces:wght@400;600&family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <link rel="stylesheet" href="css/base.css" />
+    <link rel="stylesheet" href="css/admin.css" />
+  </head>
+
+  <body class="admin">
+    <!-- Barra superior do painel -->
+    <header class="admin__topo">
+      <div class="container admin__barra">
+        <a class="logo" href="index.html" aria-label="Casa Viva Imóveis — ir para o site">
+          <svg class="logo__icone" viewBox="0 0 44 44" fill="none" aria-hidden="true">
+            <path d="M5.5 20.5 22 6l16.5 14.5" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" />
+            <path d="M10 17.8V35a3 3 0 0 0 3 3h18a3 3 0 0 0 3-3V17.8" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" />
+            <circle cx="22" cy="25" r="2.8" stroke="currentColor" stroke-width="2.2" />
+            <path d="M22 27.8V32" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" />
+          </svg>
+          <span class="logo__texto">
+            <strong>Casa Viva</strong>
+            <small>Imóveis</small>
+          </span>
+        </a>
+
+        <span class="admin__divisor" aria-hidden="true"></span>
+        <p class="admin__etiqueta">Painel de contatos</p>
+
+        <div class="admin__acoes">
+          <a class="btn btn--contorno btn--pequeno" href="index.html">Ver site</a>
+          <button class="btn btn--primario btn--pequeno" id="exportar" type="button">
+            Exportar CSV
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <main class="container admin__conteudo">
+      <div class="admin__intro">
+        <div>
+          <h1>Contatos recebidos</h1>
+          <p>
+            Estes registros foram gravados no PostgreSQL (Neon) pelo formulário
+            do site, via <code>POST /api/contatos</code>.
+          </p>
+        </div>
+        <button class="btn btn--contorno btn--pequeno" id="atualizar" type="button">
+          Atualizar lista
+        </button>
+      </div>
+
+      <!-- Cartões de resumo -->
+      <section class="resumo" aria-label="Resumo dos contatos">
+        <div class="resumo__cartao">
+          <span>Total</span>
+          <strong id="totalContatos">—</strong>
+        </div>
+        <div class="resumo__cartao resumo__cartao--alerta">
+          <span>Novos</span>
+          <strong id="totalNovos">—</strong>
+        </div>
+        <div class="resumo__cartao">
+          <span>Em atendimento</span>
+          <strong id="totalAtendimento">—</strong>
+        </div>
+        <div class="resumo__cartao">
+          <span>Atendidos</span>
+          <strong id="totalAtendidos">—</strong>
+        </div>
+      </section>
+
+      <!-- Tabela de contatos -->
+      <section class="painel" aria-label="Lista de contatos">
+        <div class="painel__barra">
+          <label for="filtroStatus">Filtrar por status</label>
+          <select id="filtroStatus">
+            <option value="">Todos</option>
+            <option value="novo">Novo</option>
+            <option value="em_atendimento">Em atendimento</option>
+            <option value="atendido">Atendido</option>
+          </select>
+          <span class="painel__hora" id="ultimaAtualizacao"></span>
+        </div>
+
+        <div class="tabela__rolagem">
+          <table class="tabela">
+            <thead>
+              <tr>
+                <th scope="col">Contato</th>
+                <th scope="col">Telefone</th>
+                <th scope="col">Interesse</th>
+                <th scope="col">Imóvel</th>
+                <th scope="col">Mensagem</th>
+                <th scope="col">Recebido em</th>
+                <th scope="col">Status</th>
+                <th scope="col">Ações</th>
+              </tr>
+            </thead>
+            <tbody id="corpoTabela"></tbody>
+          </table>
+        </div>
+
+        <p class="tabela__estado" id="estadoTabela">Carregando contatos...</p>
+      </section>
+
+      <footer class="admin__rodape">
+        <p>
+          <a class="link-botao" href="index.html">← Voltar ao site</a>
+        </p>
+        <p>Casa Viva Imóveis · projeto acadêmico de Tecnologia em IA</p>
+      </footer>
+    </main>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+    <script>
+      /* Mesma configuração do index.html: em produção, informe a URL da API. */
+      window.CASAVIVA_API_URL = "";
+    </script>
+    <script src="js/api.js"></script>
+    <script src="js/admin.js"></script>
+  </body>
+</html>
