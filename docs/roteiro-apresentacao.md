@@ -13,7 +13,8 @@ folga para imprevistos. Cada pessoa fala cerca de 3 minutos.
 - [ ] API rodando e `/api/health` com `banco: conectado` e `ia: configurada`.
 - [ ] Site aberto na aba 1, em tela cheia.
 - [ ] `admin.html` aberto na aba 2.
-- [ ] Neon com uma consulta pronta na aba 3 (opcional).
+- [ ] `banco.html` aberto na aba 3 (DER, tabelas e consultas SQL).
+- [ ] Neon com uma consulta pronta na aba 4 (opcional).
 - [ ] Chat limpo (recarregar a página) para a saudação aparecer.
 - [ ] Volume do projetor e fonte do navegador em 110%.
 

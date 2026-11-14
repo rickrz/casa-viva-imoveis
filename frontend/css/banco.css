@@ -1,0 +1,294 @@
+/* =====================================================================
+   Casa Viva Imóveis — banco.css
+   Estilos exclusivos da página "Banco de dados" (banco.html).
+   Reaproveita os tokens e componentes de base.css e admin.css
+   (barra superior, cartões de resumo, painel, tabela, botões, link-botao).
+
+   A página é estática: só existe CSS + um pequeno JS para copiar as
+   consultas. Nada de biblioteca de diagrama — o DER é desenhado com
+   HTML/CSS para continuar leve e funcionar até offline.
+   ===================================================================== */
+
+/* ---------------------------------------------------------------------
+   0. TOKENS LOCAIS
+   A fonte monoespaçada não é um token global; fica só aqui para não
+   "poluir" a paleta principal.
+   --------------------------------------------------------------------- */
+:root {
+  --fonte-codigo: "SFMono-Regular", ui-monospace, "Cascadia Code", Consolas,
+    "Liberation Mono", Menlo, monospace;
+}
+
+/* ---------------------------------------------------------------------
+   1. CABEÇALHO E ESTRUTURA DA PÁGINA
+   A barra superior e o fundo areia vêm de admin.css (body.admin).
+   --------------------------------------------------------------------- */
+.banco__intro {
+  max-width: 74ch;
+  margin-bottom: 1.6rem;
+}
+
+.banco__intro h1 {
+  font-size: clamp(1.9rem, 3.4vw, 2.6rem);
+  margin-bottom: 0.5rem;
+}
+
+.banco__intro p {
+  font-size: 0.95rem;
+  color: var(--tinta-suave);
+}
+
+.banco__intro code,
+.bloco__texto code,
+.consulta__explica code {
+  padding: 0.1rem 0.35rem;
+  border-radius: 5px;
+  background: var(--areia-forte);
+  font-family: var(--fonte-codigo);
+  font-size: 0.85em;
+}
+
+/* Cada grande assunto da página vira um "bloco" com título e texto. */
+.bloco {
+  margin-top: 2.8rem;
+}
+
+.bloco__titulo {
+  font-size: clamp(1.35rem, 2.4vw, 1.8rem);
+  margin-bottom: 0.4rem;
+}
+
+.bloco__texto {
+  max-width: 74ch;
+  margin-bottom: 1.2rem;
+  font-size: 0.9rem;
+  color: var(--tinta-suave);
+}
+
+/* ---------------------------------------------------------------------
+   2. DIAGRAMA DE FLUXO (navegador → API → banco)
+   --------------------------------------------------------------------- */
+.fluxo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+  gap: 0.7rem;
+}
+
+.fluxo__passo {
+  flex: 1 1 210px;
+  padding: 1.1rem 1.2rem;
+  border: 1px solid var(--linha);
+  border-radius: var(--raio);
+  background: var(--papel);
+}
+
+.fluxo__passo h3 {
+  margin-bottom: 0.35rem;
+  font-size: 0.98rem;
+}
+
+.fluxo__passo p {
+  font-size: 0.82rem;
+  color: var(--tinta-suave);
+}
+
+.fluxo__etiqueta {
+  display: inline-block;
+  margin-bottom: 0.6rem;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  background: var(--verde-claro);
+  color: var(--verde);
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.fluxo__seta {
+  align-self: center;
+  color: var(--tinta-suave);
+  font-size: 1.5rem;
+  line-height: 1;
+}
+
+/* ---------------------------------------------------------------------
+   3. DER — CARTÕES DE ENTIDADE
+   Cada tabela vira um "cartão" com cabeçalho verde e a lista de campos.
+   PK/FK/UK aparecem como selos, igual às ferramentas de modelagem.
+   --------------------------------------------------------------------- */
+.entidades {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(235px, 1fr));
+  align-items: start;
+  gap: 1rem;
+}
+
+.entidade {
+  overflow: hidden;
+  border: 1px solid var(--linha);
+  border-radius: var(--raio);
+  background: var(--papel);
+  box-shadow: var(--sombra-1);
+}
+
+.entidade__topo {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.6rem;
+  padding: 0.75rem 0.95rem;
+  background: var(--verde);
+  color: #fff;
+}
+
+.entidade__nome {
+  font-family: var(--fonte-titulo);
+  font-size: 1rem;
+  letter-spacing: 0.02em;
+}
+
+.entidade__total {
+  font-size: 0.68rem;
+  letter-spacing: 0.06em;
+  opacity: 0.85;
+  white-space: nowrap;
+}
+
+.entidade__campos {
+  font-size: 0.82rem;
+}
+
+.campo-linha {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.42rem 0.95rem;
+  border-top: 1px solid var(--linha);
+}
+
+.campo-linha:first-child {
+  border-top: 0;
+}
+
+.campo-linha__nome {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.campo-linha__tipo {
+  font-family: var(--fonte-codigo);
+  font-size: 0.7rem;
+  color: var(--tinta-suave);
+}
+
+/* Selos de chave (PK, FK, UK) */
+.chave {
+  flex: none;
+  padding: 0.12rem 0.42rem;
+  border-radius: 5px;
+  font-family: var(--fonte-codigo);
+  font-size: 0.64rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.chave--pk {
+  background: var(--verde-claro);
+  color: var(--verde);
+}
+
+.chave--fk {
+  background: #f6e0d5;
+  color: var(--terracota-escura);
+}
+
+.chave--uk {
+  background: #e8e4f5;
+  color: #4b3d8a;
+}
+
+/* ---------------------------------------------------------------------
+   4. CONSULTAS SQL
+   Um cartão por consulta: número, título, explicação e o bloco de código.
+   --------------------------------------------------------------------- */
+.consulta {
+  margin-bottom: 1.3rem;
+  overflow: hidden;
+  border: 1px solid var(--linha);
+  border-radius: var(--raio-g);
+  background: var(--papel);
+}
+
+.consulta__topo {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  padding: 0.85rem 1.2rem;
+  border-bottom: 1px solid var(--linha);
+  background: #faf6ee;
+}
+
+.consulta__num {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: var(--terracota);
+  color: #fff;
+  font-family: var(--fonte-titulo);
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.consulta__titulo {
+  flex: 1;
+  min-width: 0;
+  font-size: 0.98rem;
+}
+
+.consulta__explica {
+  padding: 0.9rem 1.2rem 0;
+  font-size: 0.85rem;
+  color: var(--tinta-suave);
+}
+
+.consulta__codigo {
+  margin: 0;
+  padding: 1rem 1.2rem 1.2rem;
+  overflow-x: auto;
+}
+
+.consulta__codigo code {
+  font-family: var(--fonte-codigo);
+  font-size: 0.79rem;
+  line-height: 1.7;
+  color: var(--verde-900);
+  white-space: pre;
+}
+
+/* Botão "Copiar" reaproveita .btn--contorno, só ajusta o tamanho. */
+.consulta__copiar {
+  flex: none;
+}
+
+/* ---------------------------------------------------------------------
+   5. RESPONSIVIDADE
+   --------------------------------------------------------------------- */
+@media (max-width: 640px) {
+  .fluxo__seta {
+    display: none;
+  }
+
+  .consulta__topo {
+    flex-wrap: wrap;
+  }
+
+  .consulta__copiar {
+    margin-left: 38px;
+  }
+}

@@ -105,15 +105,18 @@ casa-viva-imoveis/
 ├── frontend/
 │   ├── index.html           # site completo (hero, sobre, imóveis, contato...)
 │   ├── admin.html           # painel que lista os contatos salvos no banco
+│   ├── banco.html           # página de banco: DER, tabelas e consultas SQL
 │   ├── css/
 │   │   ├── base.css         # paleta (:root), tipografia e componentes
 │   │   ├── estilo.css       # layout das seções do site + responsividade
-│   │   └── admin.css        # estilos exclusivos do painel
+│   │   ├── admin.css        # estilos exclusivos do painel
+│   │   └── banco.css        # estilos da página de banco de dados
 │   ├── js/
 │   │   ├── api.js           # fetch, formatação e utilidades compartilhadas
 │   │   ├── site.js          # menu, filtros, cards e formulário
 │   │   ├── chat.js          # widget flutuante da Lia (POST /api/chat)
-│   │   └── admin.js         # lista, status, exclusão e CSV dos contatos
+│   │   ├── admin.js         # lista, status, exclusão e CSV dos contatos
+│   │   └── banco.js         # botão "copiar" das consultas SQL
 │   └── img/
 │       └── sem-foto.svg     # imagem usada quando um imóvel não tem foto
 ├── database/
@@ -228,6 +231,7 @@ Existem dois jeitos. O mais simples é usar o próprio Flask:
 ```text
 http://127.0.0.1:5000/         -> site (index.html)
 http://127.0.0.1:5000/admin.html -> painel de contatos
+http://127.0.0.1:5000/banco.html -> página de banco (DER, tabelas, consultas)
 ```
 
 Assim não há CORS nem configuração extra: o JavaScript chama `/api/...` na

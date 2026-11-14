@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Banco de dados — Casa Viva Imóveis</title>
+    <meta
+      name="description"
+      content="Modelo de dados da Casa Viva Imóveis: diagrama entidade-relacionamento, tabelas, restrições de integridade e as consultas SQL usadas na apresentação."
+    />
+    <meta name="theme-color" content="#1f5c4a" />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%231f5c4a'/%3E%3Cpath d='M16 7l8 6.8V24a1 1 0 0 1-1 1h-4.6v-6.4h-4.8V25H9a1 1 0 0 1-1-1V13.8z' fill='%23f7f1e6'/%3E%3C/svg%3E"
+    />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fraunces:wght@400;600&family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <link rel="stylesheet" href="css/base.css" />
+    <link rel="stylesheet" href="css/admin.css" />
+    <link rel="stylesheet" href="css/banco.css" />
+  </head>
+
+  <body class="admin">
+    <!-- Barra superior (mesmo padrão do painel) -->
+    <header class="admin__topo">
+      <div class="container admin__barra">
+        <a class="logo" href="index.html" aria-label="Casa Viva Imóveis — ir para o site">
+          <svg class="logo__icone" viewBox="0 0 44 44" fill="none" aria-hidden="true">
+            <path d="M5.5 20.5 22 6l16.5 14.5" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" />
+            <path d="M10 17.8V35a3 3 0 0 0 3 3h18a3 3 0 0 0 3-3V17.8" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" />
+            <circle cx="22" cy="25" r="2.8" stroke="currentColor" stroke-width="2.2" />
+            <path d="M22 27.8V32" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" />
+          </svg>
+          <span class="logo__texto">
+            <strong>Casa Viva</strong>
+            <small>Imóveis</small>
+          </span>
+        </a>
+
+        <span class="admin__divisor" aria-hidden="true"></span>
+        <p class="admin__etiqueta">Banco de dados</p>
+
+        <div class="admin__acoes">
+          <a class="btn btn--contorno btn--pequeno" href="admin.html">Painel de contatos</a>
+          <a class="btn btn--primario btn--pequeno" href="index.html">Ver site</a>
+        </div>
+      </div>
+    </header>
+
+    <main class="container admin__conteudo">
+      <!-- ===============================================================
+           INTRODUÇÃO
+           =============================================================== -->
+      <div class="banco__intro">
+        <h1>Banco de dados</h1>
+        <p>
+          O site da Casa Viva guarda tudo em um <strong>PostgreSQL</strong> na nuvem
+          (Neon), normalizado até a <strong>3ª Forma Normal</strong>. O navegador
+          nunca fala com o banco direto: ele chama a API Flask
+          (<code>/api/...</code>) e a API é quem executa o SQL. Esta página reúne o
+          DER, as tabelas, as restrições de integridade e as consultas usadas na
+          apresentação.
+        </p>
+      </div>
+
+      <!-- Cartões de resumo -->
+      <section class="resumo" aria-label="Resumo do modelo de dados">
+        <div class="resumo__cartao">
+          <span>Tabelas</span>
+          <strong>5</strong>
+        </div>
+        <div class="resumo__cartao">
+          <span>Relacionamentos</span>
+          <strong>4</strong>
+        </div>
+        <div class="resumo__cartao">
+          <span>Normalização</span>
+          <strong>3FN</strong>
+        </div>
+        <div class="resumo__cartao resumo__cartao--alerta">
+          <span>Consultas</span>
+          <strong>5</strong>
+        </div>
+      </section>
+
+      <!-- ===============================================================
+           VISÃO GERAL / ARQUITETURA
+           =============================================================== -->
+      <section class="bloco" aria-labelledby="titulo-arquitetura">
+        <h2 class="bloco__titulo" id="titulo-arquitetura">Como o site conversa com o banco</h2>
+        <p class="bloco__texto">
+          Toda a persistência passa pela API REST em Flask. Cada operação do site
+          (listar imóveis, enviar contato, responder no chat) vira uma rota que
+          executa SQL com <code>psycopg2</code> e devolve JSON. Os dados de conexão
+          ficam em variáveis de ambiente, nunca no código.
+        </p>
+
+        <div class="fluxo" aria-label="Fluxo: navegador, API Flask e PostgreSQL">
+          <div class="fluxo__passo">
+            <span class="fluxo__etiqueta">Front-end</span>
+            <h3>Navegador</h3>
+            <p>HTML, CSS e JavaScript puro. Faz <code>fetch</code> para a API e monta as telas.</p>
+          </div>
+          <span class="fluxo__seta" aria-hidden="true">→</span>
+          <div class="fluxo__passo">
+            <span class="fluxo__etiqueta">Back-end</span>
+            <h3>API Flask</h3>
+            <p>Valida os dados, monta o SQL parametrizado e trata os erros com o código HTTP correto.</p>
+          </div>
+          <span class="fluxo__seta" aria-hidden="true">→</span>
+          <div class="fluxo__passo">
+            <span class="fluxo__etiqueta">Dados</span>
+            <h3>PostgreSQL (Neon)</h3>
+            <p>Cinco tabelas relacionadas, com chaves e CHECKs que garantem a integridade.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Rotas da API -->
+      <section class="bloco" aria-labelledby="titulo-rotas">
+        <h2 class="bloco__titulo" id="titulo-rotas">Rotas da API e o SQL por trás</h2>
+        <p class="bloco__texto">
+          Mapeamento entre o que o front-end chama e a operação feita no banco.
+        </p>
+
+        <div class="painel">
+          <div class="tabela__rolagem">
+            <table class="tabela">
+              <thead>
+                <tr>
+                  <th scope="col">Rota</th>
+                  <th scope="col">Método</th>
+                  <th scope="col">Operação no PostgreSQL</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td data-rotulo="Rota"><code>/api/imoveis</code></td>
+                  <td data-rotulo="Método">GET</td>
+                  <td data-rotulo="Operação">SELECT com JOIN em <code>tipos_imoveis</code> e <code>bairros</code> (aceita filtros)</td>
+                </tr>
+                <tr>
+                  <td data-rotulo="Rota"><code>/api/imoveis/&lt;id&gt;</code></td>
+                  <td data-rotulo="Método">GET</td>
+                  <td data-rotulo="Operação">SELECT de um imóvel pelo id</td>
+                </tr>
+                <tr>
+                  <td data-rotulo="Rota"><code>/api/imoveis</code></td>
+                  <td data-rotulo="Método">POST</td>
+                  <td data-rotulo="Operação">INSERT INTO <code>imoveis</code></td>
+                </tr>
+                <tr>
+                  <td data-rotulo="Rota"><code>/api/imoveis/&lt;id&gt;</code></td>
+                  <td data-rotulo="Método">PUT</td>
+                  <td data-rotulo="Operação">UPDATE em <code>imoveis</code></td>
+                </tr>
+                <tr>
+                  <td data-rotulo="Rota"><code>/api/imoveis/&lt;id&gt;</code></td>
+                  <td data-rotulo="Método">DELETE</td>
+                  <td data-rotulo="Operação">DELETE FROM <code>imoveis</code></td>
+                </tr>
+                <tr>
+                  <td data-rotulo="Rota"><code>/api/contatos</code></td>
+                  <td data-rotulo="Método">GET</td>
+                  <td data-rotulo="Operação">SELECT de <code>contatos</code> com LEFT JOIN em <code>imoveis</code></td>
+                </tr>
+                <tr>
+                  <td data-rotulo="Rota"><code>/api/contatos</code></td>
+                  <td data-rotulo="Método">POST</td>
+                  <td data-rotulo="Operação">INSERT INTO <code>contatos</code> (formulário do site)</td>
+                </tr>
+                <tr>
+                  <td data-rotulo="Rota"><code>/api/contatos/&lt;id&gt;</code></td>
+                  <td data-rotulo="Método">PUT</td>
+                  <td data-rotulo="Operação">UPDATE do status em <code>contatos</code></td>
+                </tr>
+                <tr>
+                  <td data-rotulo="Rota"><code>/api/contatos/&lt;id&gt;</code></td>
+                  <td data-rotulo="Método">DELETE</td>
+                  <td data-rotulo="Operação">DELETE FROM <code>contatos</code></td>
+                </tr>
+                <tr>
+                  <td data-rotulo="Rota"><code>/api/chat</code></td>
+                  <td data-rotulo="Método">POST</td>
+                  <td data-rotulo="Operação">SELECT de <code>imoveis</code> como contexto para a Lia (não grava)</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===============================================================
+           DER — DIAGRAMA ENTIDADE-RELACIONAMENTO
+           =============================================================== -->
+      <section class="bloco" aria-labelledby="titulo-der">
+        <h2 class="bloco__titulo" id="titulo-der">Diagrama Entidade-Relacionamento (DER)</h2>
+        <p class="bloco__texto">
+          Cinco tabelas. <span class="chave chave--pk">PK</span> chave primária ·
+          <span class="chave chave--fk">FK</span> chave estrangeira ·
+          <span class="chave chave--uk">UK</span> valor único. A cadeia
+          <code>cidades → bairros → imoveis</code> evita repetir a cidade em cada
+          imóvel; <code>tipos_imoveis</code> classifica o imóvel e
+          <code>contatos</code> aponta (opcionalmente) para um imóvel.
+        </p>
+
+        <div class="entidades">
+          <!-- CIDADES -->
+          <article class="entidade">
+            <header class="entidade__topo">
+              <span class="entidade__nome">cidades</span>
+              <span class="entidade__total">3 colunas</span>
+            </header>
+            <div class="entidade__campos">
+              <div class="campo-linha">
+                <span class="campo-linha__nome">id</span>
+                <span class="campo-linha__tipo">INTEGER</span>
+                <span class="chave chave--pk">PK</span>
+              </div>
+              <div class="campo-linha">
+                <span class="campo-linha__nome">nome</span>
+                <span class="campo-linha__tipo">VARCHAR(80)</span>
+              </div>
+              <div class="campo-linha">
+                <span class="campo-linha__nome">uf</span>
+                <span class="campo-linha__tipo">CHAR(2)</span>
+              </div>
+            </div>
+          </article>
+
+          <!-- BAIRROS -->
+          <article class="entidade">
+            <header class="entidade__topo">
+              <span class="entidade__nome">bairros</span>
+              <span class="entidade__total">3 colunas</span>
+            </header>
+            <div class="entidade__campos">
+              <div class="campo-linha">
+                <span class="campo-linha__nome">id</span>
+                <span class="campo-linha__tipo">INTEGER</span>
+                <span class="chave chave--pk">PK</span>
+              </div>
+              <div class="campo-linha">
+                <span class="campo-linha__nome">nome</span>
+                <span class="campo-linha__tipo">VARCHAR(80)</span>
+              </div>
+              <div class="campo-linha">
+                <span class="campo-linha__nome">cidade_id</span>
+                <span class="campo-linha__tipo">INTEGER</span>
+                <span class="chave chave--fk">FK</span>
+              </div>
+            </div>
+          </article>
+
+          <!-- TIPOS_IMOVEIS -->
+          <article class="entidade">
+            <header class="entidade__topo">
+              <span class="entidade__nome">tipos_imoveis</span>
+              <span class="entidade__total">3 colunas</span>
+            </header>
+            <div class="entidade__campos">
+              <div class="campo-linha">
+                <span class="campo-linha__nome">id</span>
+                <span class="campo-linha__tipo">INTEGER</span>
+                <span class="chave chave--pk">PK</span>
+              </div>
+              <div class="campo-linha">
+                <span class="campo-linha__nome">nome</span>
+                <span class="campo-linha__tipo">VARCHAR(40)</span>
+                <span class="chave chave--uk">UK</span>
+              </div>
+              <div class="campo-linha">
+                <span class="campo-linha__nome">descricao</span>
+                <span class="campo-linha__tipo">TEXT</span>
+              </div>
+            </div>
+          </article>
+
+          <!-- IMOVEIS -->
+          <article class="entidade">
+            <header class="entidade__topo">
+              <span class="entidade__nome">imoveis</span>
+              <span class="entidade__total">16 colunas</span>
+            </header>
+            <div class="entidade__campos">
+              <div class="campo-linha">
+                <span class="campo-linha__nome">id</span>
+                <span class="campo-linha__tipo">INTEGER</span>
+                <span class="chave chave--pk">PK</span>
+              </div>
+              <div class="campo-linha">
+                <span class="campo-linha__nome">codigo</span>
+                <span class="campo-linha__tipo">VARCHAR(12)</span>
+                <span class="chave chave--uk">UK</span>
+              </div>
+              <div class="campo-linha">
+                <span class="campo-linha__nome">titulo</span>
+                <span class="campo-linha__tipo">VARCHAR(140)</span>
+              </div>
+              <div class="campo-linha">
+                <span class="campo-linha__nome">descricao</span>
+                <span class="campo-linha__tipo">TEXT</span>
+              </div>
+              <div class="campo-linha">
+                <span class="campo-linha__nome">tipo_id</span>
+                <span class="campo-linha__tipo">INTEGER</span>
+                <span class="chave chave--fk">FK</span>
+              </div>
+              <div class="campo-linha">
+                <span class="campo-linha__nome">bairro_id</span>
+                <span class="campo-linha__tipo">INTEGER</span>
+                <span class="chave chave--fk">FK</span>
+              </div>
+              <div class="campo-linha">
+                <span class="campo-linha__nome">finalidade</span>
+                <span class="campo-linha__tipo">VARCHAR(10)</span>
+              </div>
+              <div class="campo-linha">
+                <span class="campo-linha__nome">status</span>
+                <span class="campo-linha__tipo">VARCHAR(12)</span>
+              </div>
+              <div class="campo-linha">
+                <span class="campo-linha__nome">preco</span>
+                <span class="campo-linha__tipo">NUMERIC(12,2)</span>
+              </div>
+              <div class="campo-linha">
+                <span class="campo-linha__nome">quartos</span>
+                <span class="campo-linha__tipo">SMALLINT</span>
+              </div>
+              <div class="campo-linha">
+                <span class="campo-linha__nome">banheiros</span>
+                <span class="campo-linha__tipo">SMALLINT</span>
+              </div>
+              <div class="campo-linha">
+                <span class="campo-linha__nome">vagas</span>
+                <span class="campo-linha__tipo">SMALLINT</span>
+              </div>
+              <div class="campo-linha">
+                <span class="campo-linha__nome">area_m2</span>
+                <span class="campo-linha__tipo">NUMERIC(8,2)</span>
+              </div>
+              <div class="campo-linha">
+                <span class="campo-linha__nome">imagem_url</span>
+                <span class="campo-linha__tipo">TEXT</span>
+              </div>
+              <div class="campo-linha">
+                <span class="campo-linha__nome">destaque</span>
+                <span class="campo-linha__tipo">BOOLEAN</span>
+              </div>
+              <div class="campo-linha">
+                <span class="campo-linha__nome">criado_em</span>
+                <span class="campo-linha__tipo">TIMESTAMPTZ</span>
+              </div>
+            </div>
+          </article>
+
+          <!-- CONTATOS -->
+          <article class="entidade">
+            <header class="entidade__topo">
+              <span class="entidade__nome">contatos</span>
+              <span class="entidade__total">9 colunas</span>
+            </header>
+            <div class="entidade__campos">
+              <div class="campo-linha">
+                <span class="campo-linha__nome">id</span>
+                <span class="campo-linha__tipo">INTEGER</span>
+                <span class="chave chave--pk">PK</span>
+              </div>
+              <div class="campo-linha">
+                <span class="campo-linha__nome">nome</span>
+                <span class="campo-linha__tipo">VARCHAR(120)</span>
+              </div>
+              <div class="campo-linha">
+                <span class="campo-linha__nome">email</span>
+                <span class="campo-linha__tipo">VARCHAR(160)</span>
+              </div>
+              <div class="campo-linha">
+                <span class="campo-linha__nome">telefone</span>
+                <span class="campo-linha__tipo">VARCHAR(20)</span>
+              </div>
+              <div class="campo-linha">
+                <span class="campo-linha__nome">tipo_interesse</span>
+                <span class="campo-linha__tipo">VARCHAR(10)</span>
+              </div>
+              <div class="campo-linha">
+                <span class="campo-linha__nome">imovel_id</span>
+                <span class="campo-linha__tipo">INTEGER</span>
+                <span class="chave chave--fk">FK</span>
+              </div>
+              <div class="campo-linha">
+                <span class="campo-linha__nome">mensagem</span>
+                <span class="campo-linha__tipo">TEXT</span>
+              </div>
+              <div class="campo-linha">
+                <span class="campo-linha__nome">status</span>
+                <span class="campo-linha__tipo">VARCHAR(16)</span>
+              </div>
+              <div class="campo-linha">
+                <span class="campo-linha__nome">criado_em</span>
+                <span class="campo-linha__tipo">TIMESTAMPTZ</span>
+              </div>
+            </div>
+          </article>
+        </div>
+
+        <h3 class="bloco__titulo" style="font-size: 1.1rem; margin-top: 1.8rem">Cardinalidades</h3>
+        <div class="painel">
+          <div class="tabela__rolagem">
+            <table class="tabela">
+              <thead>
+                <tr>
+                  <th scope="col">Relacionamento</th>
+                  <th scope="col">Cardinalidade</th>
+                  <th scope="col">Regra de negócio</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td data-rotulo="Relacionamento">cidades → bairros</td>
+                  <td data-rotulo="Cardinalidade">1 : N</td>
+                  <td data-rotulo="Regra">Uma cidade tem vários bairros; cada bairro pertence a exatamente uma cidade.</td>
+                </tr>
+                <tr>
+                  <td data-rotulo="Relacionamento">bairros → imoveis</td>
+                  <td data-rotulo="Cardinalidade">1 : N</td>
+                  <td data-rotulo="Regra">Um bairro pode ter vários imóveis; cada imóvel está em um único bairro.</td>
+                </tr>
+                <tr>
+                  <td data-rotulo="Relacionamento">tipos_imoveis → imoveis</td>
+                  <td data-rotulo="Cardinalidade">1 : N</td>
+                  <td data-rotulo="Regra">Um tipo classifica vários imóveis; cada imóvel tem um único tipo.</td>
+                </tr>
+                <tr>
+                  <td data-rotulo="Relacionamento">imoveis → contatos</td>
+                  <td data-rotulo="Cardinalidade">1 : N</td>
+                  <td data-rotulo="Regra">Um imóvel pode receber vários contatos; cada contato aponta para no máximo um imóvel (ou nenhum).</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===============================================================
+           RESTRIÇÕES DE INTEGRIDADE
+           =============================================================== -->
+      <section class="bloco" aria-labelledby="titulo-restricoes">
+        <h2 class="bloco__titulo" id="titulo-restricoes">Restrições de integridade</h2>
+        <p class="bloco__texto">
+          As regras ficam no próprio banco (não só no Flask): é a última linha de
+          defesa contra dados inválidos, mesmo que alguém escreva direto no SQL.
+        </p>
+
+        <div class="painel">
+          <div class="tabela__rolagem">
+            <table class="tabela">
+              <thead>
+                <tr>
+                  <th scope="col">Tabela</th>
+                  <th scope="col">Restrição</th>
+                  <th scope="col">O que garante</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td data-rotulo="Tabela">cidades</td>
+                  <td data-rotulo="Restrição">UNIQUE (nome, uf)</td>
+                  <td data-rotulo="Garante">Não existem duas cidades iguais no mesmo estado.</td>
+                </tr>
+                <tr>
+                  <td data-rotulo="Tabela">cidades</td>
+                  <td data-rotulo="Restrição">CHECK uf ~ '^[A-Z]{2}$'</td>
+                  <td data-rotulo="Garante">UF sempre com 2 letras maiúsculas.</td>
+                </tr>
+                <tr>
+                  <td data-rotulo="Tabela">bairros</td>
+                  <td data-rotulo="Restrição">FK cidade_id → cidades (RESTRICT)</td>
+                  <td data-rotulo="Garante">Não exclui uma cidade que ainda tenha bairros.</td>
+                </tr>
+                <tr>
+                  <td data-rotulo="Tabela">bairros</td>
+                  <td data-rotulo="Restrição">UNIQUE (nome, cidade_id)</td>
+                  <td data-rotulo="Garante">O mesmo nome de bairro pode existir em cidades diferentes.</td>
+                </tr>
+                <tr>
+                  <td data-rotulo="Tabela">tipos_imoveis</td>
+                  <td data-rotulo="Restrição">UNIQUE (nome)</td>
+                  <td data-rotulo="Garante">O nome do tipo não se repete.</td>
+                </tr>
+                <tr>
+                  <td data-rotulo="Tabela">imoveis</td>
+                  <td data-rotulo="Restrição">UNIQUE (codigo)</td>
+                  <td data-rotulo="Garante">Cada imóvel tem um código único (CV-001, CV-002...).</td>
+                </tr>
+                <tr>
+                  <td data-rotulo="Tabela">imoveis</td>
+                  <td data-rotulo="Restrição">FK tipo_id, bairro_id (RESTRICT)</td>
+                  <td data-rotulo="Garante">Todo imóvel aponta para um tipo e um bairro válidos.</td>
+                </tr>
+                <tr>
+                  <td data-rotulo="Tabela">imoveis</td>
+                  <td data-rotulo="Restrição">CHECK finalidade IN ('venda','aluguel')</td>
+                  <td data-rotulo="Garante">Só aceita as duas finalidades previstas.</td>
+                </tr>
+                <tr>
+                  <td data-rotulo="Tabela">imoveis</td>
+                  <td data-rotulo="Restrição">CHECK status IN (...)</td>
+                  <td data-rotulo="Garante">Status limitado a disponivel, reservado, vendido ou alugado.</td>
+                </tr>
+                <tr>
+                  <td data-rotulo="Tabela">imoveis</td>
+                  <td data-rotulo="Restrição">CHECK preco &gt; 0, area_m2 &gt; 0, quartos &gt;= 0...</td>
+                  <td data-rotulo="Garante">Números coerentes; sem preço ou área negativos.</td>
+                </tr>
+                <tr>
+                  <td data-rotulo="Tabela">imoveis</td>
+                  <td data-rotulo="Restrição">CHECK tamanho mínimo de titulo e descricao</td>
+                  <td data-rotulo="Garante">Evita cadastro com texto vazio ou de uma letra.</td>
+                </tr>
+                <tr>
+                  <td data-rotulo="Tabela">contatos</td>
+                  <td data-rotulo="Restrição">FK imovel_id → imoveis (SET NULL)</td>
+                  <td data-rotulo="Garante">Excluir um imóvel não apaga o histórico de contatos.</td>
+                </tr>
+                <tr>
+                  <td data-rotulo="Tabela">contatos</td>
+                  <td data-rotulo="Restrição">CHECK de formato de email e telefone</td>
+                  <td data-rotulo="Garante">E-mail com @ e domínio; telefone com 10 a 13 dígitos.</td>
+                </tr>
+                <tr>
+                  <td data-rotulo="Tabela">contatos</td>
+                  <td data-rotulo="Restrição">CHECK tipo_interesse e status IN (...)</td>
+                  <td data-rotulo="Garante">Interesse e status só com valores controlados.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===============================================================
+           AS 5 CONSULTAS DA APRESENTAÇÃO
+           =============================================================== -->
+      <section class="bloco" aria-labelledby="titulo-consultas">
+        <h2 class="bloco__titulo" id="titulo-consultas">Consultas SQL da apresentação</h2>
+        <p class="bloco__texto">
+          Cinco consultas para rodar no SQL Editor do Neon, uma por vez. Cada uma
+          demonstra um recurso diferente: JOIN, agregação, CASE, AVG e window
+          function. Use o botão <em>Copiar</em> e cole direto no editor.
+        </p>
+
+        <!-- CONSULTA 1 -->
+        <article class="consulta">
+          <header class="consulta__topo">
+            <span class="consulta__num" aria-hidden="true">1</span>
+            <h3 class="consulta__titulo">Contatos recebidos + imóvel de interesse + localização</h3>
+            <button class="btn btn--contorno btn--pequeno consulta__copiar" type="button" data-copiar>
+              Copiar
+            </button>
+          </header>
+          <p class="consulta__explica">
+            Mostra o <strong>LEFT JOIN</strong>: mesmo o contato que não apontou um
+            imóvel aparece (com <code>COALESCE</code> preenchendo os vazios).
+          </p>
+          <pre class="consulta__codigo"><code>SELECT c.id,
+       c.nome,
+       c.email,
+       c.tipo_interesse,
+       c.status,
+       COALESCE(i.codigo, '—')                 AS codigo_imovel,
+       COALESCE(i.titulo, 'Não informado')     AS imovel,
+       COALESCE(b.nome || ' / ' || ci.uf, '—') AS localizacao,
+       c.criado_em
+  FROM contatos c
+  LEFT JOIN imoveis  i  ON i.id = c.imovel_id
+  LEFT JOIN bairros  b  ON b.id = i.bairro_id
+  LEFT JOIN cidades  ci ON ci.id = b.cidade_id
+ ORDER BY c.criado_em DESC;</code></pre>
+        </article>
+
+        <!-- CONSULTA 2 -->
+        <article class="consulta">
+          <header class="consulta__topo">
+            <span class="consulta__num" aria-hidden="true">2</span>
+            <h3 class="consulta__titulo">Contatos por tipo de interesse (com percentual)</h3>
+            <button class="btn btn--contorno btn--pequeno consulta__copiar" type="button" data-copiar>
+              Copiar
+            </button>
+          </header>
+          <p class="consulta__explica">
+            <strong>GROUP BY</strong> com <strong>window function</strong> para
+            calcular, em cada linha, o percentual sobre o total.
+          </p>
+          <pre class="consulta__codigo"><code>SELECT tipo_interesse,
+       COUNT(*)                                           AS total,
+       ROUND(100.0 * COUNT(*) / SUM(COUNT(*)) OVER (), 1) AS percentual
+  FROM contatos
+ GROUP BY tipo_interesse
+ ORDER BY total DESC;</code></pre>
+        </article>
+
+        <!-- CONSULTA 3 -->
+        <article class="consulta">
+          <header class="consulta__topo">
+            <span class="consulta__num" aria-hidden="true">3</span>
+            <h3 class="consulta__titulo">Imóveis à venda por faixa de preço</h3>
+            <button class="btn btn--contorno btn--pequeno consulta__copiar" type="button" data-copiar>
+              Copiar
+            </button>
+          </header>
+          <p class="consulta__explica">
+            <strong>CASE WHEN</strong> cria as faixas e o <strong>GROUP BY</strong>
+            usa a própria expressão como critério.
+          </p>
+          <pre class="consulta__codigo"><code>SELECT CASE
+         WHEN preco &lt; 500000  THEN 'Até R$ 500 mil'
+         WHEN preco &lt; 1000000 THEN 'R$ 500 mil a R$ 1 milhão'
+         ELSE                      'Acima de R$ 1 milhão'
+       END      AS faixa,
+       COUNT(*) AS quantidade
+  FROM imoveis
+ WHERE status = 'disponivel'
+   AND finalidade = 'venda'
+ GROUP BY faixa
+ ORDER BY MIN(preco);</code></pre>
+        </article>
+
+        <!-- CONSULTA 4 -->
+        <article class="consulta">
+          <header class="consulta__topo">
+            <span class="consulta__num" aria-hidden="true">4</span>
+            <h3 class="consulta__titulo">Preço médio por tipo de imóvel e finalidade</h3>
+            <button class="btn btn--contorno btn--pequeno consulta__copiar" type="button" data-copiar>
+              Copiar
+            </button>
+          </header>
+          <p class="consulta__explica">
+            <strong>JOIN</strong> com <code>tipos_imoveis</code> e funções de
+            agregação (<code>AVG</code>, <code>MIN</code>, <code>MAX</code>).
+          </p>
+          <pre class="consulta__codigo"><code>SELECT t.nome              AS tipo,
+       i.finalidade,
+       COUNT(*)            AS quantidade,
+       ROUND(AVG(i.preco), 2) AS preco_medio,
+       MIN(i.preco)        AS menor_preco,
+       MAX(i.preco)        AS maior_preco
+  FROM imoveis i
+  JOIN tipos_imoveis t ON t.id = i.tipo_id
+ GROUP BY t.nome, i.finalidade
+ ORDER BY t.nome, i.finalidade;</code></pre>
+        </article>
+
+        <!-- CONSULTA 5 -->
+        <article class="consulta">
+          <header class="consulta__topo">
+            <span class="consulta__num" aria-hidden="true">5</span>
+            <h3 class="consulta__titulo">Top 5 bairros por imóveis e ticket médio</h3>
+            <button class="btn btn--contorno btn--pequeno consulta__copiar" type="button" data-copiar>
+              Copiar
+            </button>
+          </header>
+          <p class="consulta__explica">
+            <strong>LEFT JOIN</strong> mantém os bairros ainda sem imóvel e o
+            <code>ORDER BY</code> + <code>LIMIT</code> monta o ranking.
+          </p>
+          <pre class="consulta__codigo"><code>SELECT b.nome      AS bairro,
+       c.nome      AS cidade,
+       c.uf,
+       COUNT(i.id) AS imoveis,
+       ROUND(AVG(i.preco), 2) AS ticket_medio
+  FROM bairros b
+  JOIN cidades c      ON c.id = b.cidade_id
+  LEFT JOIN imoveis i ON i.bairro_id = b.id
+ GROUP BY b.id, b.nome, c.nome, c.uf
+ ORDER BY imoveis DESC, ticket_medio DESC
+ LIMIT 5;</code></pre>
+        </article>
+      </section>
+
+      <!-- Rodapé -->
+      <footer class="admin__rodape">
+        <p>
+          <a class="link-botao" href="index.html">← Voltar ao site</a>
+          &nbsp;·&nbsp;
+          <a class="link-botao" href="admin.html">Painel de contatos</a>
+        </p>
+        <p>Casa Viva Imóveis · projeto acadêmico de Tecnologia em IA</p>
+      </footer>
+    </main>
+
+    <script src="js/banco.js"></script>
+  </body>
+</html>
