@@ -43,6 +43,6 @@ services:
       - key: GEMINI_API_KEY
         sync: false
       # Cole aqui a URL do próprio Render, ex.:
-      # https://casa-viva-api.onrender.com
+      # https://casa-viva-api-tent.onrender.com
       - key: ALLOWED_ORIGINS
         sync: false

@@ -11,7 +11,7 @@ na apresentação.
 |---|---|---|
 | **[Nome 1]** | Front-end | `index.html`, `admin.html`, 3 arquivos CSS, 4 scripts JS, responsividade, acessibilidade, capturas de tela |
 | **[Nome 2]** | Banco + back-end | `schema.sql`, `seed.sql`, `consultas.sql`, DER, rotas CRUD, validações, conexão Neon, testes da API |
-| **[Nome 3]** | IA + deploy + documentação | `ia_service.py`, prompt da Lia, exemplos de chat, deploy Render/Vercel, README, relatório e roteiro |
+| **[Nome 3]** | IA + deploy + documentação | `ia_service.py`, prompt da Lia, exemplos de chat, deploy no Render, README, relatório e roteiro |
 
 ### Regra de trabalho
 

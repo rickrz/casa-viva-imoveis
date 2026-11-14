@@ -7,6 +7,10 @@ Web para IA e Banco de Dados).
 > **Status:** projeto completo — Etapas 1 a 5 concluídas. Banco, API, site,
 > painel administrativo, assistente Lia com Gemini, deploy documentado e
 > materiais de apresentação prontos.
+>
+> **Site publicado (Render):** <https://casa-viva-api-tent.onrender.com>
+> — a mesma URL serve o site e a API. O plano gratuito hiberna após alguns
+> minutos sem acesso; a primeira visita pode levar ~30 s para responder.
 
 ---
 
@@ -74,7 +78,7 @@ primeiro imóvel, além de investidores em renda de aluguel.
 | Back-end | Python 3.11+, Flask, Flask-CORS, psycopg2, python-dotenv |
 | Banco de dados | PostgreSQL no Neon (nuvem) |
 | IA | API do Google Gemini (`gemini-flash-latest`, com modelos de reserva) chamada via REST no back-end |
-| Deploy | Render (API) e Vercel/Render Static (front) |
+| Deploy | Render (Web Service único: API Flask + front-end estático na mesma origem) |
 
 ---
 
@@ -119,7 +123,7 @@ casa-viva-imoveis/
 ├── docs/
 │   ├── der.md               # modelo lógico + Mermaid
 │   ├── exemplos-chat.md     # 5 interações da Lia (2 fora do escopo)
-│   ├── deploy.md            # passo a passo Render + Vercel
+│   ├── deploy.md            # passo a passo do deploy no Render
 │   ├── relatorio.md         # texto técnico para o relatório ABNT
 │   ├── divisao-equipe.md    # 3 partes + plano de commits
 │   ├── roteiro-apresentacao.md  # seminário de 8 a 10 minutos
@@ -245,7 +249,7 @@ acontecer:
    ```
 
    Em produção, troque pelo endereço público, ex.:
-   `https://casa-viva-api.onrender.com`.
+   `https://casa-viva-api-tent.onrender.com`.
 
 2. No `backend/.env`, inclua a origem do front em `ALLOWED_ORIGINS`:
 
@@ -254,7 +258,9 @@ acontecer:
    ```
 
 O arquivo `frontend/js/api.js` resolve o endereço nesta ordem: variável
-`window.CASAVIVA_API_URL` → mesma origem (porta 5000) → `http://127.0.0.1:5000`.
+`window.CASAVIVA_API_URL` → página local (`file://` ou porta `5500`), que aponta
+para `http://127.0.0.1:5000` → qualquer outro caso (Flask na porta 5000 ou o
+site publicado no Render em HTTPS), que usa a **mesma origem** (`/api/...`).
 Se a API estiver desligada, o site mostra um aviso com botão "Tentar novamente"
 em vez de ficar em branco.
 
@@ -411,22 +417,29 @@ O `schema.sql` começa com `DROP TABLE ... CASCADE`; portanto, rodar de novo
 
 ---
 
-## 11. Deploy (Render + Vercel)
+## 11. Deploy (Render)
 
-Resumo:
+O projeto está publicado como **um único Web Service no Render**
+(`casa-viva-api`), que serve o site estático e a API na mesma origem — assim
+não há CORS nem segunda hospedagem.
+
+- **URL:** <https://casa-viva-api-tent.onrender.com>
+- **Blueprint:** `render.yaml` na raiz do repositório (`rootDir: backend`).
+- **Build:** `pip install -r requirements.txt` · **Start:** `gunicorn app:app`
+  (definido no `Procfile`).
+- **Health check:** `/api/health`.
+
+Resumo do processo:
 
 1. **Neon** — criar o projeto e rodar `schema.sql` e `seed.sql`.
-2. **Render** — Web Service com *Root Directory* `backend`, build
-   `pip install -r requirements.txt` e start definido no `Procfile`
-   (`gunicorn app:app`). Variáveis: `DATABASE_URL`, `GEMINI_API_KEY`,
-   `GEMINI_MODEL`, `GEMINI_MODEL_FALLBACKS`, `ALLOWED_ORIGINS`, `FLASK_DEBUG=0`.
-3. **Vercel** (ou Render Static) — *Root Directory* `frontend`, sem build.
-   Antes do deploy, aponte `window.CASAVIVA_API_URL` para a URL da API.
-4. **CORS** — inclua a URL do front em `ALLOWED_ORIGINS` e reinicie a API.
+2. **Render** — *New +* → **Blueprint** → selecionar o repositório. O Render lê
+   o `render.yaml` e cria o serviço `casa-viva-api`; as variáveis secretas
+   (`DATABASE_URL`, `GEMINI_API_KEY`, `ALLOWED_ORIGINS`) são pedidas no painel e
+   nunca entram no Git.
+3. **Conferir** — abrir `/api/health` e a raiz do serviço.
 
 O passo a passo completo, com tabelas de configuração e solução de problemas,
-está em [`docs/deploy.md`](docs/deploy.md). A API também serve o front; nesse
-caso basta publicar o Render e acessar a raiz do serviço.
+está em [`docs/deploy.md`](docs/deploy.md).
 
 ---
 
@@ -435,7 +448,7 @@ caso basta publicar o Render e acessar a raiz do serviço.
 - [x] **Etapa 1** — estrutura, banco (schema/seed/consultas) e API Flask.
 - [x] **Etapa 2** — front-end (site completo + admin.html + chatbot visual).
 - [x] **Etapa 3** — assistente Lia com Gemini (persona, contexto e limites).
-- [x] **Etapa 4** — README final, deploy (Render/Vercel) e material do relatório.
+- [x] **Etapa 4** — README final, deploy (Render) e material do relatório.
 - [x] **Etapa 5** — divisão da equipe, commits no GitHub e roteiro do seminário.
 
 ---
@@ -459,5 +472,5 @@ caso basta publicar o Render e acessar a raiz do serviço.
 | [`docs/perguntas-professor.md`](docs/perguntas-professor.md) | 10 perguntas prováveis com respostas curtas |
 | [`docs/relatorio.md`](docs/relatorio.md) | texto técnico para o relatório ABNT |
 | [`docs/exemplos-chat.md`](docs/exemplos-chat.md) | 5 interações da Lia, incluindo 2 fora do escopo |
-| [`docs/deploy.md`](docs/deploy.md) | publicação no Render e na Vercel |
+| [`docs/deploy.md`](docs/deploy.md) | publicação no Render |
 | [`docs/der.md`](docs/der.md) | modelo lógico e diagrama Mermaid |

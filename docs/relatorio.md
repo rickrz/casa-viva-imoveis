@@ -96,7 +96,7 @@ O desenvolvimento seguiu cinco etapas incrementais:
 1. **Estrutura e banco** — pastas, esquema, dados de exemplo e consultas.
 2. **Front-end** — layout, responsividade, filtros, formulário e chat visual.
 3. **Assistente Lia** — integração com o Gemini, prompt e limites.
-4. **Deploy e documentação** — Render, Vercel, README e relatório.
+4. **Deploy e documentação** — Render, README e relatório.
 5. **Organização da equipe** — divisão de tarefas, commits e seminário.
 
 Cada etapa terminou com validação: execução do SQL, testes de rotas com
@@ -113,7 +113,7 @@ do serviço de IA com o cliente de testes do Flask.
 | Back-end | Python 3.12, Flask 3, Flask-CORS, psycopg2 |
 | Banco | PostgreSQL 16 no Neon |
 | IA | Google Gemini (`gemini-flash-latest` + reservas) via REST |
-| Deploy | Render (API) e Vercel (front) |
+| Deploy | Render (Web Service único: API + front na mesma origem) |
 
 ---
 

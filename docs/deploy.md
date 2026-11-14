@@ -1,17 +1,19 @@
 # Deploy — Casa Viva Imóveis
 
-Guia para publicar a **API no Render** e o **front-end na Vercel** (ou no
-Render Static Site). O banco continua no **Neon**.
+Guia de publicação do projeto. A escolha feita foi **um único Web Service no
+Render**, que serve o site e a API na mesma origem — assim não há CORS nem uma
+segunda hospedagem. O banco continua no **Neon**.
 
 ```text
 Neon (PostgreSQL)
       ▲
       │ DATABASE_URL
-Render (Flask + gunicorn)  ◄── fetch ──  Vercel (HTML/CSS/JS)
-      │                                   window.CASAVIVA_API_URL
-      └────────────── Gemini (HTTPS) ─────┘   (só o back-end tem a chave)
+Render (Flask + gunicorn)  ── serve "/" (HTML/CSS/JS)  e  "/api/*"
+      │
+      └────────────── Gemini (HTTPS) ──  (só o back-end tem a chave)
 ```
 
+> **Site publicado:** <https://casa-viva-api-tent.onrender.com>
 > Todos os serviços têm plano gratuito. O Render hiberna após alguns minutos
 > sem acesso; a primeira requisição depois disso pode demorar ~30 s.
 
@@ -26,47 +28,62 @@ Render (Flask + gunicorn)  ◄── fetch ──  Vercel (HTML/CSS/JS)
 
 ---
 
-## 2. API no Render
+## 2. Publicação no Render (Blueprint)
+
+O repositório traz o arquivo `render.yaml`, que descreve o serviço. Com ele o
+deploy vira um clique:
 
 1. Suba o projeto para o GitHub (o `.env` **não** vai junto).
-2. No Render: **New +** → **Web Service** → conecte o repositório.
-3. Preencha:
+2. No Render: **New +** → **Blueprint** → conecte o repositório.
+3. O Render lê o `render.yaml` e mostra o serviço **casa-viva-api**:
 
    | Campo | Valor |
    |---|---|
-   | Name | `casa-viva-api` |
-   | Language | `Python 3` |
+   | Runtime | `Python 3` |
    | Root Directory | `backend` |
    | Build Command | `pip install -r requirements.txt` |
    | Start Command | `gunicorn app:app --bind 0.0.0.0:$PORT --workers 2 --timeout 60` |
+   | Health Check Path | `/api/health` |
    | Instance Type | Free |
 
-   O arquivo `backend/Procfile` já contém o comando de start; o
+   O `backend/Procfile` já contém o comando de start e o
    `backend/.python-version` fixa o Python 3.12.10.
 
-4. Em **Environment Variables**, adicione:
+4. Preencha as variáveis marcadas como secretas (`sync: false` no
+   `render.yaml`). As demais já vêm do arquivo:
 
-   | Variável | Exemplo / observação |
-   |---|---|
-   | `DATABASE_URL` | connection string do Neon com `sslmode=require` |
-   | `GEMINI_API_KEY` | chave do Google AI Studio (**secret**) |
-   | `GEMINI_MODEL` | `gemini-flash-latest` |
-   | `GEMINI_MODEL_FALLBACKS` | `gemini-3.5-flash-lite,gemini-flash-lite-latest` |
-   | `ALLOWED_ORIGINS` | `https://casa-viva.vercel.app,http://127.0.0.1:5000` |
-   | `FLASK_DEBUG` | `0` |
+   | Variável | Origem | Exemplo / observação |
+   |---|---|---|
+   | `DATABASE_URL` | painel (secret) | connection string do Neon com `sslmode=require` |
+   | `GEMINI_API_KEY` | painel (secret) | chave do Gemini (**secret**) |
+   | `ALLOWED_ORIGINS` | painel (secret) | a própria URL do Render |
+   | `GEMINI_MODEL` | `render.yaml` | `gemini-flash-latest` |
+   | `GEMINI_MODEL_FALLBACKS` | `render.yaml` | `gemini-3.5-flash-lite,gemini-flash-lite-latest` |
+   | `FLASK_DEBUG` | `render.yaml` | `0` |
 
-5. Clique em **Create Web Service** e aguarde o build.
+5. Clique em **Deploy Blueprint** e aguarde o build.
 6. Teste:
 
-   - `https://casa-viva-api.onrender.com/api/health`
+   - <https://casa-viva-api-tent.onrender.com/api/health>
    - esperado: `{"api":"online","banco":"conectado","ia":"configurada",...}`
+   - e o site: <https://casa-viva-api-tent.onrender.com/>
 
-> A API também serve o front-end. Se quiser simplificar, use só o Render e
-> acesse `https://casa-viva-api.onrender.com/` — não precisa de Vercel.
+> **Nota:** o nome `casa-viva-api` já estava em uso, então o Render criou o
+> endereço `casa-viva-api-tent.onrender.com`. O nome do serviço continua
+> `casa-viva-api` no painel.
+
+### Deploy manual (sem Blueprint)
+
+Se preferir criar à mão, use **New +** → **Web Service** com os mesmos campos da
+tabela acima e cadastre as variáveis em **Environment**.
 
 ---
 
-## 3. Front-end na Vercel (opcional)
+## 3. Front-end em outro domínio (opcional)
+
+O front já é servido pelo próprio Flask, então este passo **não é necessário**.
+Use-o apenas se quiser publicar o front separado da API (Vercel ou Render
+Static Site).
 
 1. **Add New** → **Project** → importe o mesmo repositório.
 2. Configurações:
@@ -82,7 +99,7 @@ Render (Flask + gunicorn)  ◄── fetch ──  Vercel (HTML/CSS/JS)
 
    ```html
    <script>
-     window.CASAVIVA_API_URL = "https://casa-viva-api.onrender.com";
+     window.CASAVIVA_API_URL = "https://casa-viva-api-tent.onrender.com";
    </script>
    ```
 
@@ -100,15 +117,15 @@ Publish Directory `.`. O restante é igual (URL da API + CORS).
 
 ## 4. Checklist de publicação
 
-- [ ] `database/schema.sql` e `seed.sql` executados no Neon.
-- [ ] `/api/health` responde `banco: conectado`.
-- [ ] `ia: configurada` no health (chave presente).
-- [ ] `ALLOWED_ORIGINS` contém a URL exata do front (sem barra no final).
-- [ ] `window.CASAVIVA_API_URL` aponta para a API (sem barra no final).
-- [ ] Formulário grava e aparece no `admin.html`.
-- [ ] Chat responde algo coerente e recusa assunto fora do escopo.
-- [ ] Nenhuma chave aparece no console, no HTML ou no GitHub.
-- [ ] `.env` continua no `.gitignore`.
+- [x] `database/schema.sql` e `seed.sql` executados no Neon.
+- [x] `/api/health` responde `banco: conectado`.
+- [x] `ia: configurada` no health (chave presente).
+- [x] Site e API na mesma origem (sem CORS no fluxo normal).
+- [x] `ALLOWED_ORIGINS` contém a URL do Render (usado só se o front for separado).
+- [x] Formulário grava e aparece no `admin.html`.
+- [x] Chat responde algo coerente e recusa assunto fora do escopo.
+- [x] Nenhuma chave aparece no console, no HTML ou no GitHub.
+- [x] `.env` continua no `.gitignore`.
 
 ---
 
@@ -117,7 +134,8 @@ Publish Directory `.`. O restante é igual (URL da API + CORS).
 | Sintoma | Causa provável | Correção |
 |---|---|---|
 | `A API respondeu 500` | `DATABASE_URL` errada ou schema não rodado | confira o health e os logs do Render |
-| Erro de CORS no console | origem não listada | inclua a URL do front em `ALLOWED_ORIGINS` |
+| Erro de CORS no console | origem não listada (só ocorre com o front separado) | inclua a URL do front em `ALLOWED_ORIGINS` |
 | Chat com “chave não configurada” | `GEMINI_API_KEY` ausente | adicione a variável e reinicie |
-| Primeira requisição lenta | Render Free hibernou | aguarde o cold start |
+| Chat demora ~12 s | modelo principal retornou 503 e entrou a reserva | comportamento esperado (ver `docs/relatorio.md`) |
+| Primeira requisição lenta | Render Free hibernou | aguarde o cold start (~30 s) |
 | Imagens não aparecem | URL do Unsplash bloqueada | troque por imagem local em `frontend/img/` |

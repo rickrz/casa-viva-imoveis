@@ -115,8 +115,8 @@ Digite: `Me passa uma receita de bolo de cenoura.`
 **Segurança e deploy (30 s):**
 
 > As credenciais ficam só no `.env`; o CORS é restrito; todas as consultas são
-> parametrizadas; e o front escapa o texto vindo do banco. A API está no Render
-> e o site na Vercel, com o banco no Neon.
+> parametrizadas; e o front escapa o texto vindo do banco. O site e a API estão
+> publicados juntos no Render, na mesma origem, com o banco no Neon.
 
 **Conclusão (30 s):**
 
