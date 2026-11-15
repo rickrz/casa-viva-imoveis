@@ -146,13 +146,17 @@
 }
 
 .hamburguer span {
+  /* Centralização com margens automáticas (mesma técnica do .container).
+     Evitamos a propriedade "translate", que navegadores mais antigos não
+     aplicam — neles as linhas sairiam deslocadas para a direita. */
   position: absolute;
-  left: 50%;
+  left: 0;
+  right: 0;
   width: 20px;
   height: 1.6px;
+  margin-inline: auto;
   background: currentColor;
   border-radius: 2px;
-  translate: -50% 0;
   transition:
     top var(--transicao),
     transform var(--transicao),
