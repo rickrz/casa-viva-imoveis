@@ -1,0 +1,147 @@
+/* =====================================================================
+   Casa Viva Imóveis — login.css
+   Tela de acesso ao painel administrativo. Usa os tokens de base.css.
+   ===================================================================== */
+
+body.login {
+  display: grid;
+  min-height: 100vh;
+  place-items: center;
+  padding: 1.5rem;
+  background:
+    radial-gradient(circle at 15% 15%, rgba(44, 122, 96, 0.12), transparent 36%),
+    radial-gradient(circle at 85% 85%, rgba(192, 100, 64, 0.1), transparent 34%),
+    var(--areia);
+}
+
+.login__painel {
+  width: min(100%, 440px);
+  padding: 2.1rem;
+  border: 1px solid var(--linha);
+  border-radius: var(--raio-g);
+  background: var(--papel);
+  box-shadow: var(--sombra-2);
+}
+
+.login__topo {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1.6rem;
+}
+
+.login__topo .logo {
+  gap: 0.7rem;
+}
+
+.login__topo .logo__icone {
+  width: 38px;
+  height: 38px;
+  color: var(--verde);
+}
+
+.login__topo .logo__texto strong {
+  font-size: 1.25rem;
+}
+
+.login__topo .logo__texto small {
+  font-size: 0.58rem;
+}
+
+.login__olho {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--terracota-escura);
+}
+
+.login__olho::before {
+  content: "";
+  width: 24px;
+  height: 1px;
+  background: currentColor;
+}
+
+.login__titulo {
+  margin-top: 0.6rem;
+  font-size: 1.9rem;
+}
+
+.login__descricao {
+  margin-top: 0.5rem;
+  font-size: 0.88rem;
+  color: var(--tinta-suave);
+}
+
+.login__aviso {
+  margin-top: 1.1rem;
+  padding: 0.75rem 0.9rem;
+  border: 1px solid var(--verde-claro);
+  border-radius: 10px;
+  background: #eef6f1;
+  color: var(--verde-800);
+  font-size: 0.76rem;
+  line-height: 1.5;
+}
+
+.login__form {
+  display: grid;
+  gap: 0.9rem;
+  margin-top: 1.4rem;
+}
+
+.login__senha {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.login__senha input {
+  min-width: 0;
+}
+
+.login__senha .btn {
+  flex: none;
+  white-space: nowrap;
+}
+
+.login__erro {
+  min-height: 1.1rem;
+  font-size: 0.8rem;
+  color: var(--erro);
+}
+
+.login__rodape {
+  margin-top: 1.5rem;
+  padding-top: 1.1rem;
+  border-top: 1px solid var(--linha);
+  font-size: 0.76rem;
+  color: var(--tinta-suave);
+  text-align: center;
+}
+
+.login__rodape p {
+  margin-top: 0.55rem;
+}
+
+@media (max-width: 480px) {
+  body.login {
+    padding: 1rem;
+    place-items: start center;
+  }
+
+  .login__painel {
+    margin-block: 1rem;
+    padding: 1.5rem 1.2rem;
+  }
+
+  .login__titulo {
+    font-size: 1.65rem;
+  }
+
+  .login__senha {
+    flex-direction: column;
+  }
+}

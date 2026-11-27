@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Acesso administrativo — Casa Viva Imóveis</title>
+    <meta name="description" content="Área de acesso restrito aos criadores do site Casa Viva Imóveis." />
+    <meta name="theme-color" content="#1f5c4a" />
+    <meta name="robots" content="noindex, nofollow" />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%231f5c4a'/%3E%3Cpath d='M16 7l8 6.8V24a1 1 0 0 1-1 1h-4.6v-6.4h-4.8V25H9a1 1 0 0 1-1-1V13.8z' fill='%23f7f1e6'/%3E%3C/svg%3E"
+    />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fraunces:wght@400;600&family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <link rel="stylesheet" href="css/base.css" />
+    <link rel="stylesheet" href="css/login.css" />
+  </head>
+
+  <body class="login">
+    <main class="login__painel">
+      <div class="login__topo">
+        <a class="logo" href="index.html" aria-label="Casa Viva Imóveis — ir para o site">
+          <svg class="logo__icone" viewBox="0 0 44 44" fill="none" aria-hidden="true">
+            <path d="M5.5 20.5 22 6l16.5 14.5" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" />
+            <path d="M10 17.8V35a3 3 0 0 0 3 3h18a3 3 0 0 0 3-3V17.8" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" />
+            <circle cx="22" cy="25" r="2.8" stroke="currentColor" stroke-width="2.2" />
+            <path d="M22 27.8V32" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" />
+          </svg>
+          <span class="logo__texto">
+            <strong>Casa Viva</strong>
+            <small>Imóveis</small>
+          </span>
+        </a>
+      </div>
+
+      <p class="login__olho">Acesso restrito</p>
+      <h1 class="login__titulo">Área administrativa</h1>
+      <p class="login__descricao">
+        Entre com a conta criada pelos desenvolvedores do site para acompanhar
+        os contatos recebidos.
+      </p>
+
+      <div class="login__aviso">
+        <strong>Proteção de acesso:</strong> as senhas ficam armazenadas com hash
+        no banco e a sessão expira automaticamente.
+      </div>
+
+      <form class="login__form" id="formLogin" novalidate>
+        <div class="campo">
+          <label for="usuario">Usuário</label>
+          <input
+            id="usuario"
+            name="usuario"
+            type="text"
+            autocomplete="username"
+            placeholder="admin"
+            required
+            autofocus
+          />
+        </div>
+
+        <div class="campo">
+          <label for="senha">Senha</label>
+          <div class="login__senha">
+            <input
+              id="senha"
+              name="senha"
+              type="password"
+              autocomplete="current-password"
+              placeholder="Sua senha de acesso"
+              required
+            />
+            <button id="mostrarSenha" class="btn btn--contorno btn--pequeno" type="button" aria-label="Mostrar senha">
+              Mostrar
+            </button>
+          </div>
+        </div>
+
+        <p class="login__erro" id="erroLogin" role="alert" aria-live="polite"></p>
+
+        <button class="btn btn--primario btn--grande btn--bloco" id="entrar" type="submit">
+          Entrar no painel
+        </button>
+      </form>
+
+      <div class="login__rodape">
+        <a class="link-botao" href="index.html">← Voltar ao site</a>
+        <p>Casa Viva Imóveis · projeto acadêmico de Tecnologia em IA</p>
+      </div>
+    </main>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+    <script>
+      window.CASAVIVA_API_URL = "";
+    </script>
+    <script src="js/api.js"></script>
+    <script src="js/login.js"></script>
+  </body>
+</html>

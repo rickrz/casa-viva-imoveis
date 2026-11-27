@@ -27,12 +27,25 @@ body.admin {
   height: 74px;
 }
 
+/* Logo do painel: antes o SVG ficava sem largura (estilo.css não é
+   carregado aqui) e crescia dentro do cabeçalho. Agora tem tamanho fixo. */
 .admin__topo .logo {
+  gap: 0.5rem;
   color: var(--tinta);
 }
 
 .admin__topo .logo__icone {
+  width: 30px;
+  height: 30px;
   color: var(--verde);
+}
+
+.admin__topo .logo__texto strong {
+  font-size: 1rem;
+}
+
+.admin__topo .logo__texto small {
+  font-size: 0.5rem;
 }
 
 .admin__divisor {
@@ -58,8 +71,103 @@ body.admin {
 /* ---------------------------------------------------------------------
    2. CABEÇALHO DA PÁGINA
    --------------------------------------------------------------------- */
+[hidden] {
+  display: none !important;
+}
+
+/* O painel agora tem duas colunas: navegação à esquerda, conteúdo à direita.
+   Cada assunto (visão geral, contatos, conta) aparece em sua própria seção. */
 .admin__conteudo {
-  padding-block: 2.5rem 4rem;
+  display: grid;
+  grid-template-columns: 230px minmax(0, 1fr);
+  align-items: start;
+  gap: 1.5rem;
+  padding-block: 2rem 4rem;
+}
+
+.admin__miolo {
+  min-width: 0;
+}
+
+.admin__menu {
+  position: sticky;
+  top: 96px;
+  padding: 1rem;
+  border: 1px solid var(--linha);
+  border-radius: var(--raio);
+  background: var(--papel);
+}
+
+.admin__menu-titulo {
+  padding-inline: 0.5rem;
+  font-size: 0.64rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--tinta-suave);
+}
+
+.admin__menu-lista {
+  display: grid;
+  gap: 0.3rem;
+  margin-top: 0.8rem;
+}
+
+.admin__menu-item {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  width: 100%;
+  padding: 0.7rem 0.8rem;
+  border-radius: 10px;
+  color: var(--tinta-suave);
+  font-size: 0.86rem;
+  font-weight: 600;
+  text-align: left;
+  transition:
+    background var(--transicao),
+    color var(--transicao);
+}
+
+.admin__menu-item:hover {
+  background: var(--areia);
+  color: var(--tinta);
+}
+
+.admin__menu-item.is-ativo {
+  background: var(--verde);
+  color: #fff;
+}
+
+.admin__menu-item span[aria-hidden] {
+  width: 1.1rem;
+  font-size: 0.95rem;
+  text-align: center;
+}
+
+.admin__menu-info {
+  margin-top: 1.1rem;
+  padding: 1rem 0.5rem 0;
+  border-top: 1px solid var(--linha);
+  font-size: 0.74rem;
+  color: var(--tinta-suave);
+  overflow-wrap: anywhere;
+}
+
+.admin__menu-info strong {
+  display: block;
+  margin-top: 0.15rem;
+  color: var(--tinta);
+  font-size: 0.84rem;
+}
+
+.admin__menu-saida {
+  width: 100%;
+  margin-top: 0.9rem;
+}
+
+.admin__secao {
+  margin-bottom: 1.5rem;
 }
 
 .admin__intro {
@@ -67,7 +175,7 @@ body.admin {
   align-items: flex-end;
   justify-content: space-between;
   gap: 2rem;
-  margin-bottom: 2rem;
+  margin-bottom: 1.5rem;
 }
 
 .admin__intro h1 {
@@ -325,6 +433,189 @@ body.admin {
 }
 
 /* ---------------------------------------------------------------------
+   4.1 VISÃO GERAL
+   --------------------------------------------------------------------- */
+.admin__acoes-rapidas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-top: 1rem;
+}
+
+.visao {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
+  gap: 1rem;
+}
+
+.cartao {
+  overflow: hidden;
+  border: 1px solid var(--linha);
+  border-radius: var(--raio);
+  background: var(--papel);
+}
+
+.cartao__cabecalho {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+  padding: 1rem 1.2rem;
+  border-bottom: 1px solid var(--linha);
+}
+
+.cartao__cabecalho h2 {
+  font-size: 1.05rem;
+}
+
+.cartao__cabecalho p {
+  font-size: 0.76rem;
+  color: var(--tinta-suave);
+}
+
+.cartao__corpo {
+  padding: 1.1rem 1.2rem 1.3rem;
+}
+
+.lista-ultimos {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.lista-ultimos__item {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.8rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px dashed var(--linha);
+}
+
+.lista-ultimos__item:last-child {
+  padding-bottom: 0;
+  border-bottom: 0;
+}
+
+.lista-ultimos__nome {
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+
+.lista-ultimos__msg {
+  margin-top: 0.1rem;
+  font-size: 0.78rem;
+  color: var(--tinta-suave);
+  overflow-wrap: anywhere;
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.lista-ultimos__hora {
+  display: block;
+  margin-top: 0.25rem;
+  font-size: 0.7rem;
+  color: var(--tinta-suave);
+}
+
+.estado {
+  flex: none;
+  padding: 0.24rem 0.58rem;
+  border-radius: 999px;
+  font-size: 0.68rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.estado--novo {
+  background: #fff3e3;
+  color: #8a4b12;
+}
+
+.estado--em_atendimento {
+  background: #fbf5da;
+  color: #7a5a0b;
+}
+
+.estado--atendido {
+  background: #e8f4ed;
+  color: var(--verde);
+}
+
+/* ---------------------------------------------------------------------
+   4.2 MINHA CONTA
+   --------------------------------------------------------------------- */
+.conta {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  gap: 1rem;
+}
+
+.conta__cartao {
+  padding: 1.3rem;
+  border: 1px solid var(--linha);
+  border-radius: var(--raio);
+  background: var(--papel);
+}
+
+.conta__cartao h2 {
+  margin-bottom: 0.5rem;
+  font-size: 1.1rem;
+}
+
+.conta__cartao > p {
+  font-size: 0.86rem;
+  color: var(--tinta-suave);
+}
+
+.conta__dado {
+  margin-top: 1rem;
+  padding: 0.8rem 1rem;
+  border-radius: 10px;
+  background: var(--areia);
+}
+
+.conta__dado span {
+  display: block;
+  font-size: 0.64rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--tinta-suave);
+}
+
+.conta__dado strong {
+  display: block;
+  margin-top: 0.2rem;
+  overflow-wrap: anywhere;
+}
+
+.conta__alerta {
+  margin-top: 1rem;
+  padding: 0.85rem 1rem;
+  border: 1px solid #e3c36a;
+  border-radius: 10px;
+  background: #fbf5da;
+  color: #7a5a0b;
+  font-size: 0.84rem;
+}
+
+.form-senha {
+  display: grid;
+  gap: 0.9rem;
+  margin-top: 1.2rem;
+}
+
+.form-senha__acoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.7rem;
+  margin-top: 0.3rem;
+}
+
+/* ---------------------------------------------------------------------
    5. RODAPÉ
    --------------------------------------------------------------------- */
 .admin__rodape {
@@ -470,7 +761,7 @@ body.admin {
     display: none;
   }
 
-  .admin__acoes .btn--contorno {
+  .admin__acoes a.btn--contorno {
     display: none;
   }
 
@@ -514,5 +805,65 @@ body.admin {
   .tabela td:nth-child(7) .tabela__status {
     width: auto;
     min-width: 170px;
+  }
+}
+
+/* ---------------------------------------------------------------------
+   7. ORGANIZAÇÃO POR SEÇÕES
+   No desktop a navegação fica fixa à esquerda. No celular ela vira uma
+   barra horizontal, mantendo as três áreas separadas e alcançáveis.
+   --------------------------------------------------------------------- */
+@media (max-width: 1000px) {
+  .admin__conteudo {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .admin__menu {
+    position: static;
+    padding: 0.7rem;
+  }
+
+  .admin__menu-titulo,
+  .admin__menu-info {
+    display: none;
+  }
+
+  .admin__menu-lista {
+    display: flex;
+    gap: 0.4rem;
+    margin: 0;
+    overflow-x: auto;
+  }
+
+  .admin__menu-item {
+    flex: none;
+    width: auto;
+    padding: 0.6rem 0.85rem;
+    white-space: nowrap;
+  }
+
+  .visao,
+  .conta {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .admin__menu-item {
+    font-size: 0.8rem;
+  }
+
+  .admin__menu-item span[aria-hidden] {
+    display: none;
+  }
+
+  .admin__intro p code {
+    display: none;
+  }
+
+  .cartao__cabecalho,
+  .cartao__corpo,
+  .conta__cartao {
+    padding: 1rem;
   }
 }

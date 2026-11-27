@@ -175,6 +175,44 @@ p {
   margin-inline: auto;
 }
 
+/* Logomarca reaproveitada pelo site, pelo painel e pelo login.
+   O estilo.css sobrescreve estes valores no site (ícone 38px / título maior);
+   aqui a versão fica compacta para cabeçalhos de páginas internas. */
+.logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  color: inherit;
+}
+
+.logo__icone {
+  width: 32px;
+  height: 32px;
+  flex: none;
+  color: var(--terracota);
+}
+
+.logo__texto {
+  display: flex;
+  flex-direction: column;
+  line-height: 1;
+}
+
+.logo__texto strong {
+  font-family: var(--fonte-titulo);
+  font-size: 1.05rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.logo__texto small {
+  margin-top: 0.25rem;
+  font-size: 0.55rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  opacity: 0.72;
+}
+
 .secao {
   padding-block: var(--secao);
 }

@@ -52,8 +52,8 @@ primeiro imóvel, além de investidores em renda de aluguel.
 - formulário com validação no navegador e no servidor, máscara de telefone e
   feedback de sucesso/erro;
 - chat flutuante com a Lia, histórico curto e resposta em tempo real;
-- painel administrativo com resumo, filtro por status, alteração, exclusão e
-  exportação CSV dos contatos;
+- painel administrativo com login, visão geral, filtro por status, alteração,
+  exclusão e exportação CSV dos contatos;
 - CRUD completo de contatos e imóveis na API;
 - banco normalizado em 3FN, com integridade referencial e consultas de
   relatório.
@@ -87,7 +87,9 @@ primeiro imóvel, além de investidores em renda de aluguel.
 ```text
 casa-viva-imoveis/
 ├── backend/
-│   ├── app.py               # cria a aplicação Flask e registra as rotas
+│   ├── app.py               # cria a aplicação, sessão e proteção das rotas
+│   ├── auth.py              # login, logout, sessão e troca de senha
+│   ├── seguranca.py         # lê a chave da sessão persistida no banco
 │   ├── config.py            # lê as variáveis do .env
 │   ├── db.py                # conexão e helpers SQL (psycopg2)
 │   ├── validacao.py         # validações dos formulários
@@ -98,30 +100,35 @@ casa-viva-imoveis/
 │   ├── services/
 │   │   └── ia_service.py    # persona, prompt e chamada ao Gemini
 │   ├── aplicar_banco.py     # roda schema.sql + seed.sql e confere o banco
+│   ├── aplicar_seguranca.py # cria admin, senha temporária e chave da sessão
 │   ├── Procfile             # comando de start no Render (gunicorn)
 │   ├── .python-version      # versão do Python usada no deploy
 │   ├── requirements.txt
 │   └── .env.example         # modelo das variáveis de ambiente
 ├── frontend/
 │   ├── index.html           # site completo (hero, sobre, imóveis, contato...)
-│   ├── admin.html           # painel que lista os contatos salvos no banco
+│   ├── login.html           # acesso restrito ao painel
+│   ├── admin.html           # painel: visão geral, contatos e minha conta
 │   ├── banco.html           # página de banco: DER, tabelas e consultas SQL
 │   ├── css/
-│   │   ├── base.css         # paleta (:root), tipografia e componentes
+│   │   ├── base.css         # paleta (:root), componentes e logo compartilhada
 │   │   ├── estilo.css       # layout das seções do site + responsividade
 │   │   ├── admin.css        # estilos exclusivos do painel
+│   │   ├── login.css        # estilos da tela de login
 │   │   └── banco.css        # estilos da página de banco de dados
 │   ├── js/
 │   │   ├── api.js           # fetch, formatação e utilidades compartilhadas
 │   │   ├── site.js          # menu, filtros, cards e formulário
 │   │   ├── chat.js          # widget flutuante da Lia (POST /api/chat)
-│   │   ├── admin.js         # lista, status, exclusão e CSV dos contatos
+│   │   ├── login.js         # autenticação e redirecionamento
+│   │   ├── admin.js         # sessão, seções, contatos e CSV
 │   │   └── banco.js         # botão "copiar" das consultas SQL
 │   └── img/
 │       └── sem-foto.svg     # imagem usada quando um imóvel não tem foto
 ├── database/
 │   ├── schema.sql           # CREATE TABLEs (DDL)
 │   ├── seed.sql             # dados de exemplo (DML)
+│   ├── seguranca.sql        # tabelas de administradores e chave da sessão
 │   └── consultas.sql        # 5 consultas para a apresentação
 ├── docs/
 │   ├── der.md               # modelo lógico + Mermaid
@@ -436,6 +443,8 @@ não há CORS nem segunda hospedagem.
 Resumo do processo:
 
 1. **Neon** — criar o projeto e rodar `schema.sql` e `seed.sql`.
+   Depois rode `backend/aplicar_seguranca.py` para criar o usuário `admin`,
+   a senha temporária e a chave da sessão (a senha aparece só uma vez).
 2. **Render** — *New +* → **Blueprint** → selecionar o repositório. O Render lê
    o `render.yaml` e cria o serviço `casa-viva-api`; as variáveis secretas
    (`DATABASE_URL`, `GEMINI_API_KEY`, `ALLOWED_ORIGINS`) são pedidas no painel e
@@ -459,11 +468,42 @@ está em [`docs/deploy.md`](docs/deploy.md).
 
 ## 13. Segurança
 
-- Chaves e senhas **somente** em `backend/.env` (ignorado pelo Git).
+### Acesso ao painel
+
+- `/admin.html` e `/banco.html` só abrem depois de login; sem sessão a página
+  volta para `/login.html`.
+- `GET/PUT/DELETE /api/contatos` e `POST/PUT/DELETE /api/imoveis` exigem sessão.
+- `POST /api/contatos` **continua público**: é o formulário do site recebendo
+  mensagens de visitantes.
+- Usuários ficam na tabela `administradores`; a senha é salva apenas como hash
+  PBKDF2-SHA256 (`werkzeug.security`), nunca em texto puro.
+- O usuário inicial `admin` entra com senha temporária e é obrigado a trocá-la
+  no primeiro login (`trocar_senha = TRUE`).
+- Após 5 erros seguidos, a conta fica bloqueada por 15 minutos.
+- O cookie de sessão é `HttpOnly`, `SameSite=Strict` e `Secure` em HTTPS, com
+  validade de 8 horas. A chave de assinatura fica no banco (`config_seguranca`),
+  igual para todos os workers do gunicorn.
+
+### Como criar ou renovar a senha
+
+```powershell
+cd backend
+.\\.venv\\Scripts\\python.exe aplicar_seguranca.py
+# para gerar outra senha temporária:
+.\\.venv\\Scripts\\python.exe aplicar_seguranca.py --reset-senha admin
+```
+
+A senha temporária aparece uma única vez no terminal e **não** vai para o Git,
+para o zip ou para o relatório.
+
+### Outras boas práticas já adotadas
+
+- Chaves de API **somente** em `backend/.env` (ignorado pelo Git).
 - O front-end nunca recebe a chave do Gemini: todas as chamadas passam pela API.
 - A API valida os dados antes do banco e devolve códigos HTTP corretos
-  (`200`, `201`, `204`, `400`, `404`, `409`, `500`).
+  (`200`, `201`, `204`, `400`, `401`, `403`, `404`, `409`, `429`, `500`).
 - O CORS aceita apenas as origens listadas em `ALLOWED_ORIGINS`.
+- CSS/JS usam `no-cache`; páginas de login/painel usam `no-store`.
 
 ---
 

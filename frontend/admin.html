@@ -3,9 +3,10 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Painel de contatos — Casa Viva Imóveis</title>
-    <meta name="description" content="Painel administrativo para acompanhar os contatos recebidos pelo site da Casa Viva Imóveis." />
+    <title>Painel administrativo — Casa Viva Imóveis</title>
+    <meta name="description" content="Área restrita aos criadores do site para acompanhar contatos e administrar a conta." />
     <meta name="theme-color" content="#1f5c4a" />
+    <meta name="robots" content="noindex, nofollow" />
     <link
       rel="icon"
       href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%231f5c4a'/%3E%3Cpath d='M16 7l8 6.8V24a1 1 0 0 1-1 1h-4.6v-6.4h-4.8V25H9a1 1 0 0 1-1-1V13.8z' fill='%23f7f1e6'/%3E%3C/svg%3E"
@@ -40,93 +41,228 @@
         </a>
 
         <span class="admin__divisor" aria-hidden="true"></span>
-        <p class="admin__etiqueta">Painel de contatos</p>
+        <p class="admin__etiqueta">Área restrita</p>
 
         <div class="admin__acoes">
           <a class="btn btn--contorno btn--pequeno" href="index.html">Ver site</a>
-          <button class="btn btn--primario btn--pequeno" id="exportar" type="button">
-            Exportar CSV
-          </button>
+          <button class="btn btn--contorno btn--pequeno js-sair" type="button">Sair</button>
         </div>
       </div>
     </header>
 
     <main class="container admin__conteudo">
-      <div class="admin__intro">
-        <div>
-          <h1>Contatos recebidos</h1>
+      <!-- Navegação separada por assunto -->
+      <aside class="admin__menu" aria-label="Navegação do painel">
+        <p class="admin__menu-titulo">Painel administrativo</p>
+        <nav class="admin__menu-lista" aria-label="Seções">
+          <button class="admin__menu-item is-ativo" type="button" data-secao="visao" aria-current="page">
+            <span aria-hidden="true">◱</span> Visão geral
+          </button>
+          <button class="admin__menu-item" type="button" data-secao="contatos">
+            <span aria-hidden="true">✉</span> Contatos
+          </button>
+          <button class="admin__menu-item" type="button" data-secao="conta">
+            <span aria-hidden="true">⚙</span> Minha conta
+          </button>
+        </nav>
+
+        <div class="admin__menu-info">
+          Conectado como
+          <strong id="adminUsuario">...</strong>
+          <button class="btn btn--contorno btn--pequeno admin__menu-saida js-sair" type="button">
+            Encerrar sessão
+          </button>
+        </div>
+      </aside>
+
+      <div class="admin__miolo">
+        <!-- 1. VISÃO GERAL ------------------------------------------------ -->
+        <section class="admin__secao" id="secao-visao" aria-labelledby="tituloVisao">
+          <div class="admin__intro">
+            <div>
+              <h1 id="tituloVisao">Visão geral</h1>
+              <p>Um resumo rápido do que chegou pelo formulário do site.</p>
+            </div>
+            <div class="admin__acoes-rapidas">
+              <button class="btn btn--secundario btn--pequeno" id="irContatos" type="button">
+                Ver contatos
+              </button>
+              <button class="btn btn--contorno btn--pequeno" id="irConta" type="button">
+                Minha conta
+              </button>
+            </div>
+          </div>
+
+          <section class="resumo" aria-label="Resumo dos contatos">
+            <div class="resumo__cartao">
+              <span>Total</span>
+              <strong id="totalContatos">—</strong>
+            </div>
+            <div class="resumo__cartao resumo__cartao--alerta">
+              <span>Novos</span>
+              <strong id="totalNovos">—</strong>
+            </div>
+            <div class="resumo__cartao">
+              <span>Em atendimento</span>
+              <strong id="totalAtendimento">—</strong>
+            </div>
+            <div class="resumo__cartao">
+              <span>Atendidos</span>
+              <strong id="totalAtendidos">—</strong>
+            </div>
+          </section>
+
+          <div class="visao">
+            <article class="cartao">
+              <div class="cartao__cabecalho">
+                <h2>Últimos contatos</h2>
+                <p>Os 3 mais recentes</p>
+              </div>
+              <div class="cartao__corpo">
+                <div class="lista-ultimos" id="ultimosContatos">
+                  <p class="tabela__estado">Carregando contatos...</p>
+                </div>
+              </div>
+            </article>
+
+            <article class="cartao">
+              <div class="cartao__cabecalho">
+                <h2>Como funciona</h2>
+              </div>
+              <div class="cartao__corpo">
+                <p style="font-size: 0.86rem; color: var(--tinta-suave);">
+                  Cada mensagem enviada pelo site é gravada no PostgreSQL (Neon)
+                  por <code>POST /api/contatos</code>. Aqui você acompanha o status,
+                  responde e exporta a lista em CSV.
+                </p>
+                <div class="admin__acoes-rapidas">
+                  <button class="btn btn--contorno btn--pequeno" id="atualizar" type="button">
+                    Atualizar lista
+                  </button>
+                  <a class="link-botao" href="banco.html">Ver banco de dados →</a>
+                </div>
+              </div>
+            </article>
+          </div>
+        </section>
+
+        <!-- 2. CONTATOS --------------------------------------------------- -->
+        <section class="admin__secao" id="secao-contatos" aria-labelledby="tituloContatos" hidden>
+          <div class="admin__intro">
+            <div>
+              <h2 id="tituloContatos">Contatos recebidos</h2>
+              <p>Filtre, altere o status, exclua ou exporte os registros.</p>
+            </div>
+            <button class="btn btn--contorno btn--pequeno" id="atualizarContatos" type="button">
+              Atualizar lista
+            </button>
+          </div>
+
+          <section class="painel" aria-label="Lista de contatos">
+            <div class="painel__barra">
+              <label for="filtroStatus">Filtrar por status</label>
+              <select id="filtroStatus">
+                <option value="">Todos</option>
+                <option value="novo">Novo</option>
+                <option value="em_atendimento">Em atendimento</option>
+                <option value="atendido">Atendido</option>
+              </select>
+              <button class="btn btn--contorno btn--pequeno" id="exportar" type="button">
+                Exportar CSV
+              </button>
+              <span class="painel__hora" id="ultimaAtualizacao"></span>
+            </div>
+
+            <div class="tabela__rolagem">
+              <table class="tabela">
+                <thead>
+                  <tr>
+                    <th scope="col">Contato</th>
+                    <th scope="col">Telefone</th>
+                    <th scope="col">Interesse</th>
+                    <th scope="col">Imóvel</th>
+                    <th scope="col">Mensagem</th>
+                    <th scope="col">Recebido em</th>
+                    <th scope="col">Status</th>
+                    <th scope="col">Ações</th>
+                  </tr>
+                </thead>
+                <tbody id="corpoTabela"></tbody>
+              </table>
+            </div>
+
+            <p class="tabela__estado" id="estadoTabela">Carregando contatos...</p>
+          </section>
+        </section>
+
+        <!-- 3. MINHA CONTA ------------------------------------------------ -->
+        <section class="admin__secao" id="secao-conta" aria-labelledby="tituloConta" hidden>
+          <div class="admin__intro">
+            <div>
+              <h2 id="tituloConta">Minha conta</h2>
+              <p>Sua sessão e a senha de acesso ao painel.</p>
+            </div>
+          </div>
+
+          <div class="conta">
+            <article class="conta__cartao">
+              <h2>Sessão</h2>
+              <p>Acesso permitido somente aos criadores do site.</p>
+              <div class="conta__dado">
+                <span>Usuário conectado</span>
+                <strong id="contaUsuario">...</strong>
+              </div>
+              <div class="conta__dado">
+                <span>Permissão</span>
+                <strong>Administrador</strong>
+              </div>
+            </article>
+
+            <article class="conta__cartao">
+              <h2>Alterar senha</h2>
+              <p>Use uma senha com pelo menos 8 caracteres e não compartilhe.</p>
+
+              <div class="conta__alerta" id="avisoTroca" hidden>
+                <strong>Senha temporária.</strong> Troque-a agora para liberar o acesso
+                aos contatos.
+              </div>
+
+              <form class="form-senha" id="formSenha">
+                <div class="campo">
+                  <label for="senhaAtual">Senha atual</label>
+                  <input id="senhaAtual" type="password" autocomplete="current-password" required />
+                </div>
+                <div class="campo">
+                  <label for="senhaNova">Nova senha</label>
+                  <input id="senhaNova" type="password" autocomplete="new-password" minlength="8" required />
+                </div>
+                <div class="campo">
+                  <label for="senhaConfirmacao">Confirmar nova senha</label>
+                  <input id="senhaConfirmacao" type="password" autocomplete="new-password" minlength="8" required />
+                  <span class="campo__erro" id="erroSenha"></span>
+                </div>
+                <div class="form-senha__acoes">
+                  <button class="btn btn--primario btn--pequeno" type="submit">
+                    Salvar nova senha
+                  </button>
+                  <button class="btn btn--contorno btn--pequeno js-sair" type="button">
+                    Sair da conta
+                  </button>
+                </div>
+              </form>
+            </article>
+          </div>
+        </section>
+
+        <footer class="admin__rodape">
           <p>
-            Estes registros foram gravados no PostgreSQL (Neon) pelo formulário
-            do site, via <code>POST /api/contatos</code>.
+            <a class="link-botao" href="index.html">← Voltar ao site</a>
+            &nbsp;·&nbsp;
+            <a class="link-botao" href="banco.html">Ver banco de dados</a>
           </p>
-        </div>
-        <button class="btn btn--contorno btn--pequeno" id="atualizar" type="button">
-          Atualizar lista
-        </button>
+          <p>Casa Viva Imóveis · projeto acadêmico de Tecnologia em IA</p>
+        </footer>
       </div>
-
-      <!-- Cartões de resumo -->
-      <section class="resumo" aria-label="Resumo dos contatos">
-        <div class="resumo__cartao">
-          <span>Total</span>
-          <strong id="totalContatos">—</strong>
-        </div>
-        <div class="resumo__cartao resumo__cartao--alerta">
-          <span>Novos</span>
-          <strong id="totalNovos">—</strong>
-        </div>
-        <div class="resumo__cartao">
-          <span>Em atendimento</span>
-          <strong id="totalAtendimento">—</strong>
-        </div>
-        <div class="resumo__cartao">
-          <span>Atendidos</span>
-          <strong id="totalAtendidos">—</strong>
-        </div>
-      </section>
-
-      <!-- Tabela de contatos -->
-      <section class="painel" aria-label="Lista de contatos">
-        <div class="painel__barra">
-          <label for="filtroStatus">Filtrar por status</label>
-          <select id="filtroStatus">
-            <option value="">Todos</option>
-            <option value="novo">Novo</option>
-            <option value="em_atendimento">Em atendimento</option>
-            <option value="atendido">Atendido</option>
-          </select>
-          <span class="painel__hora" id="ultimaAtualizacao"></span>
-        </div>
-
-        <div class="tabela__rolagem">
-          <table class="tabela">
-            <thead>
-              <tr>
-                <th scope="col">Contato</th>
-                <th scope="col">Telefone</th>
-                <th scope="col">Interesse</th>
-                <th scope="col">Imóvel</th>
-                <th scope="col">Mensagem</th>
-                <th scope="col">Recebido em</th>
-                <th scope="col">Status</th>
-                <th scope="col">Ações</th>
-              </tr>
-            </thead>
-            <tbody id="corpoTabela"></tbody>
-          </table>
-        </div>
-
-        <p class="tabela__estado" id="estadoTabela">Carregando contatos...</p>
-      </section>
-
-      <footer class="admin__rodape">
-        <p>
-          <a class="link-botao" href="index.html">← Voltar ao site</a>
-          &nbsp;·&nbsp;
-          <a class="link-botao" href="banco.html">Ver banco de dados</a>
-        </p>
-        <p>Casa Viva Imóveis · projeto acadêmico de Tecnologia em IA</p>
-      </footer>
     </main>
 
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
