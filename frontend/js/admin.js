@@ -121,7 +121,9 @@
           CV.data(contato.criado_em) +
           "</td>" +
           '<td data-rotulo="Status">' +
-          '<select class="tabela__status" data-id="' +
+          '<select class="tabela__status tabela__status--' +
+          CV.escapar(contato.status) +
+          '" data-id="' +
           contato.id +
           '" data-status-anterior="' +
           CV.escapar(contato.status) +
@@ -198,6 +200,8 @@
         },
       });
 
+      select.classList.remove("tabela__status--" + statusAnterior);
+      select.classList.add("tabela__status--" + select.value);
       contato.status = select.value;
       atualizarResumo();
       CV.avisar('Status alterado para "' + ROTULOS_STATUS[contato.status] + '".');

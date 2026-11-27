@@ -25,6 +25,10 @@ from routes.contatos import contatos_bp
 from routes.imoveis import imoveis_bp
 
 # Caminho absoluto da pasta do front-end (independente de onde o Python roda).
+# O Flask entrega o front-end da mesma origem da API (sem CORS em produção).
+# Atenção para o deploy: o Blueprint do Render usa rootDir=backend, então o
+# autoDeploy só dispara quando o commit toca algo dentro de backend/. Mudanças
+# apenas em frontend/ exigem deploy manual ou um commit que também toque aqui.
 PASTA_FRONTEND = os.path.abspath(
     os.path.join(os.path.dirname(__file__), "..", "frontend")
 )
