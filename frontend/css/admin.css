@@ -384,8 +384,8 @@ body.admin {
     display: grid;
     grid-template-columns: 1fr 1fr;
     column-gap: 1.2rem;
-    row-gap: 0.55rem;
-    padding: 1rem 1rem 1.1rem;
+    row-gap: 0.35rem;
+    padding: 0.7rem 1rem 0.8rem;
     border-bottom: 1px solid var(--linha);
   }
 
@@ -422,6 +422,24 @@ body.admin {
   .tabela td:nth-child(6) { grid-column: 1; }
   .tabela td:nth-child(7) { grid-column: 2; }
   .tabela td:nth-child(8) { grid-column: 1 / -1; }
+
+  /* Rótulos redundantes some no celular: os valores já se explicam.
+     Mantemos "Imóvel" e "Recebido em", que não são óbvios sozinhos. */
+  .tabela td:nth-child(1)::before,
+  .tabela td:nth-child(2)::before,
+  .tabela td:nth-child(3)::before,
+  .tabela td:nth-child(5)::before,
+  .tabela td:nth-child(7)::before,
+  .tabela td:nth-child(8)::before {
+    display: none;
+  }
+
+  .tabela__pessoa {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.15rem 0.6rem;
+  }
 
   .tabela__mensagem {
     max-width: none;

@@ -58,6 +58,13 @@ def criar_app():
     app = Flask(__name__, static_folder=PASTA_FRONTEND, static_url_path="")
     app.json = ProvedorJSON(app)
 
+    @app.after_request
+    def sem_cache_de_estaticos(resposta):
+        """CSS e JS sempre atualizados após um deploy, sem Ctrl+F5."""
+        if request.path.endswith((".css", ".js")):
+            resposta.headers["Cache-Control"] = "no-cache, must-revalidate"
+        return resposta
+
     # Valida a configuração antes de subir o servidor.
     Config.validar()
 
